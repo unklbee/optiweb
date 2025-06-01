@@ -1,0 +1,153 @@
+<!-- templates/services/category.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Layanan {{ category.name }} - Service Laptop Bandung{% endblock %}
+{% block description %}Layanan {{ category.name }} terpercaya di Bandung. {{ category.description|default:"Teknisi berpengalaman dengan peralatan modern." }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="mb-6">
+    <ol class="flex text-gray-500 text-sm">
+        <li><a href="{% url 'home' %}" class="hover:text-blue-600">Home</a></li>
+        <li class="mx-2">/</li>
+        <li><a href="{% url 'services:list' %}" class="hover:text-blue-600">Layanan</a></li>
+        <li class="mx-2">/</li>
+        <li class="text-gray-700">{{ category.name }}</li>
+    </ol>
+</nav>
+
+<div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <!-- Category Header -->
+    <div class="text-center mb-8">
+        {% if category.icon %}
+        <div class="mb-4">
+            <i class="{{ category.icon }} text-6xl text-blue-600"></i>
+        </div>
+        {% endif %}
+
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">
+            Layanan {{ category.name }}
+        </h1>
+
+        {% if category.description %}
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            {{ category.description }}
+        </p>
+        {% else %}
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Layanan {{ category.name }} terpercaya dengan teknisi berpengalaman dan peralatan modern.
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Services in Category -->
+    {% if services %}
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+            Daftar Layanan {{ category.name }}
+        </h2>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for service in services %}
+            <div class="bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition-shadow">
+                {% if service.featured_image %}
+                <img src="{{ service.featured_image.url }}"
+                     alt="{{ service.name }}"
+                     class="w-full h-48 object-cover rounded-t-lg">
+                {% else %}
+                <div class="w-full h-48 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center rounded-t-lg">
+                    {% if service.icon %}
+                    <i class="{{ service.icon }} text-white text-4xl"></i>
+                    {% else %}
+                    <i class="fas fa-tools text-white text-4xl"></i>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">{{ service.name }}</h3>
+                    <p class="text-gray-600 mb-3 text-sm">{{ service.short_description }}</p>
+
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg font-bold text-green-600">{{ service.get_price_range }}</span>
+                        <span class="text-sm text-gray-500">{{ service.duration_estimate }}</span>
+                    </div>
+
+                    <a href="{{ service.get_absolute_url }}"
+                       class="block w-full text-center bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors">
+                        Lihat Detail
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <div class="mb-4">
+            {% if category.icon %}
+            <i class="{{ category.icon }} text-gray-400 text-6xl"></i>
+            {% else %}
+            <i class="fas fa-tools text-gray-400 text-6xl"></i>
+            {% endif %}
+        </div>
+        <h3 class="text-xl text-gray-600 mb-2">Belum Ada Layanan</h3>
+        <p class="text-gray-500">Layanan {{ category.name }} akan segera tersedia!</p>
+    </div>
+    {% endif %}
+
+    <!-- Other Categories -->
+    <div class="border-t border-gray-200 pt-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Kategori Layanan Lainnya</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {% for other_category in all_categories %}
+            {% if other_category.id != category.id %}
+            <a href="{% url 'services:category' other_category.slug %}"
+               class="block bg-gray-50 border border-gray-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                {% if other_category.icon %}
+                <i class="{{ other_category.icon }} text-blue-600 text-3xl mb-2"></i>
+                {% endif %}
+                <h4 class="font-semibold text-gray-800">{{ other_category.name }}</h4>
+            </a>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-6">
+            <a href="{% url 'services:list' %}"
+               class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                Lihat Semua Layanan
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Contact CTA -->
+<div class="bg-blue-600 text-white rounded-lg p-8 text-center">
+    <h2 class="text-3xl font-bold mb-4">Butuh Layanan {{ category.name }}?</h2>
+    <p class="text-xl mb-6 text-blue-100">
+        Konsultasi gratis dengan teknisi berpengalaman kami
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        {% if business_info %}
+        <a href="https://wa.me/{{ business_info.whatsapp }}?text=Halo, saya ingin konsultasi tentang layanan {{ category.name }}"
+           target="_blank"
+           class="inline-flex items-center justify-center px-8 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-lg font-medium">
+            <i class="fab fa-whatsapp mr-3"></i>
+            Chat WhatsApp
+        </a>
+        <a href="tel:{{ business_info.phone }}"
+           class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors text-lg font-medium">
+            <i class="fas fa-phone mr-3"></i>
+            Telepon Sekarang
+        </a>
+        {% endif %}
+        <a href="{% url 'content:contact' %}"
+           class="inline-flex items-center justify-center px-8 py-4 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors text-lg font-medium">
+            <i class="fas fa-envelope mr-3"></i>
+            Kirim Pesan
+        </a>
+    </div>
+</div>
+{% endblock %}

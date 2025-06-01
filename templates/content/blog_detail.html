@@ -1,0 +1,118 @@
+<!-- templates/content/blog_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.get_meta_title }}{% endblock %}
+{% block description %}{{ post.get_meta_description }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="mb-6">
+    <ol class="flex text-gray-500 text-sm">
+        <li><a href="{% url 'home' %}" class="hover:text-blue-600">Home</a></li>
+        <li class="mx-2">/</li>
+        <li><a href="{% url 'content:blog_list' %}" class="hover:text-blue-600">Blog</a></li>
+        <li class="mx-2">/</li>
+        <li class="text-gray-700">{{ post.title|truncatewords:5 }}</li>
+    </ol>
+</nav>
+
+<!-- Main Article -->
+<article class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+    <!-- Featured Image -->
+    {% if post.featured_image %}
+    <div class="h-64 md:h-96 overflow-hidden">
+        <img src="{{ post.featured_image.url }}"
+             alt="{{ post.title }}"
+             class="w-full h-full object-cover">
+    </div>
+    {% endif %}
+
+    <!-- Article Header -->
+    <div class="p-8">
+        <!-- Meta Info -->
+        <div class="flex items-center text-sm text-gray-500 mb-4">
+            <i class="fas fa-calendar mr-2"></i>
+            <span>{{ post.publish_date|date:"d F Y" }}</span>
+            <span class="mx-3">•</span>
+            <i class="fas fa-user mr-2"></i>
+            <span>{{ post.author.get_full_name|default:post.author.username }}</span>
+            <span class="mx-3">•</span>
+            <i class="fas fa-clock mr-2"></i>
+            <span>{{ post.content|wordcount }} kata</span>
+        </div>
+
+        <!-- Title -->
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">{{ post.title }}</h1>
+
+        <!-- Tags -->
+        {% if post.tags.all %}
+        <div class="flex flex-wrap gap-2 mb-6">
+            {% for tag in post.tags.all %}
+            <span class="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                <i class="fas fa-tag mr-1"></i>{{ tag.name }}
+            </span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Content -->
+        <div class="prose prose-lg max-w-none">
+            {{ post.content|safe }}
+        </div>
+
+        <!-- Social Share -->
+        <div class="border-t border-gray-200 pt-6 mt-8">
+            <h3 class="text-lg font-semibold mb-4">Bagikan Artikel Ini:</h3>
+            <div class="flex space-x-4">
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+                   target="_blank"
+                   class="flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                    <i class="fab fa-facebook-f mr-2"></i>Facebook
+                </a>
+                <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title }}"
+                   target="_blank"
+                   class="flex items-center px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">
+                    <i class="fab fa-twitter mr-2"></i>Twitter
+                </a>
+                <a href="https://wa.me/?text={{ post.title }} {{ request.build_absolute_uri }}"
+                   target="_blank"
+                   class="flex items-center px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+                    <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- Related Posts -->
+{% if related_posts %}
+<div class="bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-6">Artikel Terkait</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+        {% for related in related_posts %}
+        <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+            {% if related.featured_image %}
+            <img src="{{ related.featured_image.url }}"
+                 alt="{{ related.title }}"
+                 class="w-full h-32 object-cover">
+            {% else %}
+            <div class="w-full h-32 bg-gray-200 flex items-center justify-center">
+                <i class="fas fa-laptop text-gray-400 text-2xl"></i>
+            </div>
+            {% endif %}
+
+            <div class="p-4">
+                <h3 class="font-semibold mb-2 hover:text-blue-600 transition-colors">
+                    <a href="{{ related.get_absolute_url }}">{{ related.title|truncatewords:8 }}</a>
+                </h3>
+                <p class="text-gray-600 text-sm mb-3">{{ related.excerpt|truncatewords:15 }}</p>
+                <a href="{{ related.get_absolute_url }}"
+                   class="text-blue-600 hover:underline text-sm">Baca →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

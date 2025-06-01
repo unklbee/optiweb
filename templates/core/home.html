@@ -1,0 +1,334 @@
+<!-- templates/core/home.html -->
+{% extends 'base.html' %}
+{% load schema_tags %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg shadow-xl p-8 mb-8">
+        <div class="grid lg:grid-cols-2 gap-8 items-center">
+            <div>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                    {% if business_info %}
+                        {{ business_info.business_name }}
+                    {% else %}
+                        Service Laptop Bandung Terpercaya
+                    {% endif %}
+                </h1>
+                <p class="text-xl mb-6 text-blue-100">
+                    Solusi terpercaya untuk semua masalah laptop Anda.
+                    Teknisi berpengalaman, garansi resmi, harga terjangkau.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    {% if business_info %}
+                        <a href="https://wa.me/{{ business_info.whatsapp }}"
+                           target="_blank"
+                           class="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                            <i class="fab fa-whatsapp mr-2"></i>
+                            Konsultasi Gratis
+                        </a>
+                        <a href="tel:{{ business_info.phone }}"
+                           class="inline-flex items-center justify-center px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors font-medium">
+                            <i class="fas fa-phone mr-2"></i>
+                            Telepon Sekarang
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-laptop-medical text-8xl text-blue-200 mb-4" role="img"
+                   aria-label="Service laptop profesional Bandung"></i>
+                <p class="text-blue-100">Service Profesional Sejak 2020</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Info Quick Access -->
+    {% if business_info %}
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-map-marker-alt text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Lokasi Kami</h3>
+                <p class="text-gray-600 text-sm">{{ business_info.address }}</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fab fa-whatsapp text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">WhatsApp</h3>
+                <a href="https://wa.me/{{ business_info.whatsapp }}"
+                   target="_blank"
+                   class="text-green-600 hover:underline">{{ business_info.whatsapp }}</a>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                <div class="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-clock text-yellow-600 text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Jam Buka</h3>
+                <p class="text-gray-600 text-sm">Sen-Sab: 08:00-20:00</p>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Featured Services -->
+    {% if featured_services %}
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Layanan Unggulan Kami</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for service in featured_services %}
+                    <div class="bg-gray-50 border rounded-lg p-6 hover:shadow-lg transition-shadow duration-300 group">
+                        <div class="text-center mb-4">
+                            {% if service.icon %}
+                                <i class="{{ service.icon }} text-4xl text-blue-600 mb-3 group-hover:scale-110 transition-transform"></i>
+                            {% endif %}
+                            <h3 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">{{ service.name }}</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4 text-center">{{ service.short_description|truncatewords:20 }}</p>
+                        <div class="text-center">
+                            <p class="text-green-600 font-bold mb-3">{{ service.get_price_range }}</p>
+                            <p class="text-gray-500 text-sm mb-4">Estimasi: {{ service.duration_estimate }}</p>
+                            <a href="{{ service.get_absolute_url }}"
+                               class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                Lihat Detail
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-8">
+                <a href="{% url 'services:list' %}"
+                   class="inline-block bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors text-lg font-medium">
+                    Lihat Semua Layanan
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Brand Laptop Support -->
+    {% if laptop_brands %}
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Brand Laptop yang Kami Layani</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                {% for brand in laptop_brands %}
+                    <div class="bg-gray-50 border rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                        {% if brand.logo %}
+                            <img src="{{ brand.logo.url }}" alt="{{ brand.name }}"
+                                 class="h-8 mx-auto mb-2 object-contain">
+                        {% endif %}
+                        <span class="text-sm font-medium text-gray-700">{{ brand.name }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+            <p class="text-center text-gray-600 mt-4">Dan masih banyak brand lainnya!</p>
+        </div>
+    {% endif %}
+
+    <!-- Featured FAQ -->
+    {% if featured_faqs %}
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Pertanyaan yang Sering Diajukan</h2>
+            <div class="space-y-4">
+                {% for faq in featured_faqs %}
+                    <div class="border border-gray-200 rounded-lg">
+                        <button class="faq-toggle w-full text-left p-4 hover:bg-gray-50 transition-colors flex justify-between items-center"
+                                data-target="home-faq-{{ faq.id }}">
+                            <span class="font-medium text-gray-800">{{ faq.question }}</span>
+                            <i class="fas fa-chevron-down text-gray-400 transform transition-transform duration-200"></i>
+                        </button>
+                        <div id="home-faq-{{ faq.id }}" class="faq-content hidden p-4 pt-0 border-t border-gray-200">
+                            <div class="prose max-w-none text-gray-600">
+                                {{ faq.answer|safe }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-6">
+                <a href="{% url 'content:faq' %}"
+                   class="inline-block text-blue-600 hover:text-blue-800 font-medium">
+                    Lihat FAQ Lengkap →
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Featured Testimonials -->
+    {% if featured_reviews %}
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Apa Kata Customer Kami</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                {% for review in featured_reviews %}
+                    <div class="bg-gray-50 rounded-lg p-6 border-l-4 border-blue-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold mr-4">
+                                {{ review.customer_name|first|upper }}
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">{{ review.customer_name }}</h4>
+                                <div class="flex text-yellow-400 text-sm">
+                                    {% for i in review.get_star_range %}
+                                        <i class="fas fa-star"></i>
+                                    {% endfor %}
+                                    {% for i in review.get_empty_star_range %}
+                                        <i class="far fa-star"></i>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <blockquote class="text-gray-600 italic mb-3">
+                            "{{ review.review_text|truncatewords:25 }}"
+                        </blockquote>
+                        {% if review.laptop_brand %}
+                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                {{ review.laptop_brand }}
+            </span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-6">
+                <a href="{% url 'content:testimonials' %}"
+                   class="inline-block text-blue-600 hover:text-blue-800 font-medium">
+                    Lihat Semua Testimonial →
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Why Choose Us -->
+    <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-8 mb-8">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Mengapa Memilih Kami?</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="text-center">
+                <div class="bg-blue-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-tools text-white text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Teknisi Berpengalaman</h3>
+                <p class="text-gray-600 text-sm">Tim teknisi dengan pengalaman 5+ tahun</p>
+            </div>
+
+            <div class="text-center">
+                <div class="bg-green-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Garansi Resmi</h3>
+                <p class="text-gray-600 text-sm">Garansi service hingga 3 bulan</p>
+            </div>
+
+            <div class="text-center">
+                <div class="bg-yellow-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-clock text-white text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Pengerjaan Cepat</h3>
+                <p class="text-gray-600 text-sm">Estimasi 1-3 hari kerja</p>
+            </div>
+
+            <div class="text-center">
+                <div class="bg-purple-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-dollar-sign text-white text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Harga Terjangkau</h3>
+                <p class="text-gray-600 text-sm">Harga kompetitif dengan kualitas terbaik</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="bg-blue-600 text-white rounded-lg p-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Laptop Bermasalah? Konsultasi Sekarang!</h2>
+        <p class="text-xl mb-6 text-blue-100">
+            Dapatkan diagnosis gratis dan solusi terbaik untuk laptop Anda
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% if business_info %}
+                <a href="https://wa.me/{{ business_info.whatsapp }}"
+                   target="_blank"
+                   class="inline-flex items-center justify-center px-8 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-lg font-medium">
+                    <i class="fab fa-whatsapp mr-3"></i>
+                    Chat WhatsApp
+                </a>
+                <a href="tel:{{ business_info.phone }}"
+                   class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors text-lg font-medium">
+                    <i class="fas fa-phone mr-3"></i>
+                    Telepon Langsung
+                </a>
+            {% endif %}
+            <a href="{% url 'content:contact' %}"
+               class="inline-flex items-center justify-center px-8 py-4 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors text-lg font-medium">
+                <i class="fas fa-envelope mr-3"></i>
+                Kirim Pesan
+            </a>
+        </div>
+    </div>
+
+    <!-- Tambahkan setelah CTA section -->
+    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Jadi Member untuk Keuntungan Lebih!</h2>
+        <div class="grid md:grid-cols-3 gap-6 mb-6">
+            <div class="text-center">
+                <i class="fas fa-search text-4xl mb-2 opacity-80"></i>
+                <h3 class="font-semibold mb-2">Real-time Tracking</h3>
+                <p class="text-green-100 text-sm">Pantau progress service laptop Anda</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-star text-4xl mb-2 opacity-80"></i>
+                <h3 class="font-semibold mb-2">Earn Points</h3>
+                <p class="text-green-100 text-sm">Dapatkan points setiap service</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-gift text-4xl mb-2 opacity-80"></i>
+                <h3 class="font-semibold mb-2">Exclusive Rewards</h3>
+                <p class="text-green-100 text-sm">Tukar points dengan discount</p>
+            </div>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'customers:register' %}"
+               class="inline-flex items-center justify-center px-8 py-4 bg-white text-green-600 rounded-lg hover:bg-gray-100 transition-colors text-lg font-medium">
+                <i class="fas fa-user-plus mr-3"></i>
+                Daftar Gratis Sekarang
+            </a>
+            <a href="{% url 'customers:login' %}"
+               class="inline-flex items-center justify-center px-8 py-4 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors text-lg font-medium">
+                <i class="fas fa-sign-in-alt mr-3"></i>
+                Login Member
+            </a>
+        </div>
+    </div>
+
+    <!-- FAQ Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const faqToggles = document.querySelectorAll('.faq-toggle');
+
+            faqToggles.forEach(toggle => {
+                toggle.addEventListener('click', function () {
+                    const targetId = this.getAttribute('data-target');
+                    const content = document.getElementById(targetId);
+                    const icon = this.querySelector('i');
+
+                    content.classList.toggle('hidden');
+
+                    if (content.classList.contains('hidden')) {
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- FAQ Schema -->
+    {% if featured_faqs %}
+        {% faq_schema featured_faqs %}
+    {% endif %}
+
+    <!-- Breadcrumb Schema untuk Homepage -->
+    {% breadcrumb_schema breadcrumbs %}
+
+{% endblock %}

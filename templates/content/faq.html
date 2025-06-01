@@ -1,0 +1,118 @@
+<!-- templates/content/faq.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h1>
+        <p class="text-xl text-gray-600">Jawaban untuk pertanyaan yang sering diajukan</p>
+    </div>
+
+    <!-- FAQ Categories -->
+    {% for category_name, faqs in faq_by_category.items %}
+    {% if faqs %}
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-blue-600 mb-6 flex items-center">
+            {% if category_name == "Umum" %}
+                <i class="fas fa-question-circle mr-3"></i>
+            {% elif category_name == "Harga" %}
+                <i class="fas fa-money-bill-wave mr-3"></i>
+            {% elif category_name == "Garansi" %}
+                <i class="fas fa-shield-alt mr-3"></i>
+            {% elif category_name == "Layanan" %}
+                <i class="fas fa-tools mr-3"></i>
+            {% elif category_name == "Teknis" %}
+                <i class="fas fa-cog mr-3"></i>
+            {% endif %}
+            {{ category_name }}
+        </h2>
+
+        <div class="space-y-4">
+            {% for faq in faqs %}
+            <div class="border border-gray-200 rounded-lg">
+                <button class="faq-toggle w-full text-left p-4 hover:bg-gray-50 transition-colors flex justify-between items-center"
+                        data-target="faq-{{ faq.id }}">
+                    <span class="font-medium text-gray-800">{{ faq.question }}</span>
+                    <i class="fas fa-chevron-down text-gray-400 transform transition-transform duration-200"></i>
+                </button>
+                <div id="faq-{{ faq.id }}" class="faq-content hidden p-4 pt-0 border-t border-gray-200">
+                    <div class="prose max-w-none text-gray-600">
+                        {{ faq.answer|safe }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+    <!-- Contact CTA -->
+    <div class="bg-blue-50 rounded-lg p-6 text-center mt-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Masih Ada Pertanyaan?</h3>
+        <p class="text-gray-600 mb-4">Tim kami siap membantu Anda dengan pertanyaan apapun</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            {% if business_info %}
+            <a href="https://wa.me/{{ business_info.whatsapp }}"
+               target="_blank"
+               class="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <i class="fab fa-whatsapp mr-2"></i>
+                Chat WhatsApp
+            </a>
+            <a href="tel:{{ business_info.phone }}"
+               class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-phone mr-2"></i>
+                Telepon Langsung
+            </a>
+            {% endif %}
+            <a href="{% url 'content:contact' %}"
+               class="inline-flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                <i class="fas fa-envelope mr-2"></i>
+                Kirim Pesan
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const faqToggles = document.querySelectorAll('.faq-toggle');
+
+    faqToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const content = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+
+            // Toggle content
+            content.classList.toggle('hidden');
+
+            // Rotate icon
+            if (content.classList.contains('hidden')) {
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                icon.style.transform = 'rotate(180deg)';
+            }
+
+            // Close other FAQs (optional - accordion behavior)
+            faqToggles.forEach(otherToggle => {
+                if (otherToggle !== this) {
+                    const otherTargetId = otherToggle.getAttribute('data-target');
+                    const otherContent = document.getElementById(otherTargetId);
+                    const otherIcon = otherToggle.querySelector('i');
+
+                    otherContent.classList.add('hidden');
+                    otherIcon.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,93 @@
+<!-- templates/services/list.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ view.title }}{% endblock %}
+{% block description %}{{ view.description }}{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <h1 class="text-3xl font-bold text-center mb-6">Layanan Service Laptop Bandung</h1>
+
+    <!-- Category Filter -->
+    <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-3">Filter Kategori:</h3>
+        <div class="flex flex-wrap gap-2">
+            <a href="{% url 'services:list' %}"
+               class="px-4 py-2 rounded {% if not selected_category %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-700 hover:bg-gray-300{% endif %}">
+                Semua
+            </a>
+            {% for category in categories %}
+            <a href="?category={{ category.slug }}"
+               class="px-4 py-2 rounded {% if selected_category == category.slug %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-700 hover:bg-gray-300{% endif %}">
+                {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Services Grid -->
+    {% if services %}
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for service in services %}
+        <div class="bg-white border rounded-lg shadow hover:shadow-lg transition-shadow">
+            {% if service.featured_image %}
+            <img src="{{ service.featured_image.url }}"
+                 alt="{{ service.name }}"
+                 class="w-full h-48 object-cover rounded-t-lg">
+            {% endif %}
+
+            <div class="p-4">
+                {% if service.category %}
+                <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mb-2">
+                    {{ service.category.name }}
+                </span>
+                {% endif %}
+
+                <h3 class="text-xl font-semibold mb-2">{{ service.name }}</h3>
+                <p class="text-gray-600 mb-3">{{ service.short_description }}</p>
+
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-lg font-bold text-green-600">{{ service.get_price_range }}</span>
+                    <span class="text-sm text-gray-500">{{ service.duration_estimate }}</span>
+                </div>
+
+                <a href="{{ service.get_absolute_url }}"
+                   class="block w-full text-center bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors">
+                    Lihat Detail
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="flex justify-center mt-8">
+        <div class="flex space-x-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"
+               class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                « Previous
+            </a>
+            {% endif %}
+
+            <span class="px-4 py-2 bg-blue-600 text-white rounded">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"
+               class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                Next »
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <p class="text-center text-gray-600">Belum ada layanan yang tersedia.</p>
+    {% endif %}
+</div>
+{% endblock %}

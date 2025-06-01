@@ -1,0 +1,179 @@
+<!-- ========================================
+templates/customers/base_customer.html
+======================================== -->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Customer Navigation Sidebar -->
+    <div class="flex">
+        <!-- Sidebar for desktop -->
+        <div class="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:pt-20">
+            <div class="flex-1 flex flex-col min-h-0 bg-white shadow-lg">
+                <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+                    <!-- User Profile Card -->
+                    <div class="px-4 mb-6">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
+                            <div class="flex items-center">
+                                <div class="bg-white bg-opacity-20 rounded-full p-2 mr-3">
+                                    <i class="fas fa-user text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">{{ user.get_full_name|default:user.username }}</h3>
+                                    {% if user.customerprofile %}
+                                    <p class="text-blue-100 text-sm">{{ user.customerprofile.membership_level }} Member</p>
+                                    <p class="text-blue-100 text-sm">{{ user.customerprofile.total_points }} Points</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Menu -->
+                    <nav class="flex-1 px-4 space-y-2">
+                        <a href="{% url 'customers:dashboard' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                        </a>
+                        <a href="{% url 'customers:orders' %}"
+                           class="nav-link {% if 'orders' in request.resolver_match.url_name %}active{% endif %}">
+                            <i class="fas fa-list mr-3"></i>Order Saya
+                        </a>
+                        <a href="{% url 'customers:create_order' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'create_order' %}active{% endif %}">
+                            <i class="fas fa-plus-circle mr-3"></i>Buat Order Baru
+                        </a>
+                        <a href="{% url 'customers:loyalty' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'loyalty' %}active{% endif %}">
+                            <i class="fas fa-star mr-3"></i>Program Loyalty
+                        </a>
+                        <a href="{% url 'customers:profile' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                            <i class="fas fa-user-edit mr-3"></i>Profile Saya
+                        </a>
+                        <a href="{% url 'customers:notifications' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+                            <i class="fas fa-bell mr-3"></i>Notifikasi
+                        </a>
+
+                        <hr class="my-4">
+
+                        <a href="{% url 'home' %}" class="nav-link">
+                            <i class="fas fa-home mr-3"></i>Kembali ke Website
+                        </a>
+                        <a href="{% url 'customers:logout' %}" class="nav-link text-red-600 hover:bg-red-50">
+                            <i class="fas fa-sign-out-alt mr-3"></i>Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="lg:pl-64 flex flex-col flex-1">
+            <!-- Mobile menu button -->
+            <div class="lg:hidden bg-white shadow-sm border-b border-gray-200 px-4 py-3">
+                <button id="mobile-sidebar-toggle" class="text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Page content -->
+            <main class="flex-1 p-4 lg:p-8">
+                {% block customer_content %}
+                {% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobile-sidebar-overlay" class="lg:hidden fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-50" id="mobile-sidebar-backdrop"></div>
+        <div class="fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-xl">
+            <!-- Mobile sidebar content (same as desktop) -->
+            <div class="flex flex-col h-full">
+                <div class="px-4 py-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                    <button id="mobile-sidebar-close" class="float-right text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                    <div class="flex items-center mt-4">
+                        <div class="bg-white bg-opacity-20 rounded-full p-2 mr-3">
+                            <i class="fas fa-user text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">{{ user.get_full_name|default:user.username }}</h3>
+                            {% if user.customerprofile %}
+                            <p class="text-blue-100 text-sm">{{ user.customerprofile.membership_level }} Member</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="flex-1 px-4 py-6 space-y-2">
+                    <!-- Same navigation links as desktop -->
+                    <a href="{% url 'customers:dashboard' %}" class="mobile-nav-link">
+                        <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                    </a>
+                    <a href="{% url 'customers:orders' %}" class="mobile-nav-link">
+                        <i class="fas fa-list mr-3"></i>Order Saya
+                    </a>
+                    <a href="{% url 'customers:create_order' %}" class="mobile-nav-link">
+                        <i class="fas fa-plus-circle mr-3"></i>Buat Order Baru
+                    </a>
+                    <a href="{% url 'customers:loyalty' %}" class="mobile-nav-link">
+                        <i class="fas fa-star mr-3"></i>Program Loyalty
+                    </a>
+                    <a href="{% url 'customers:profile' %}" class="mobile-nav-link">
+                        <i class="fas fa-user-edit mr-3"></i>Profile Saya
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.nav-link {
+    @apply flex items-center px-4 py-3 text-gray-700 rounded-lg transition-colors duration-200 hover:bg-blue-50 hover:text-blue-700;
+}
+
+.nav-link.active {
+    @apply bg-blue-50 text-blue-700 border-r-4 border-blue-700;
+}
+
+.mobile-nav-link {
+    @apply block px-4 py-3 text-gray-700 rounded-lg transition-colors duration-200 hover:bg-blue-50;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileToggle = document.getElementById('mobile-sidebar-toggle');
+    const mobileOverlay = document.getElementById('mobile-sidebar-overlay');
+    const mobileClose = document.getElementById('mobile-sidebar-close');
+    const mobileBackdrop = document.getElementById('mobile-sidebar-backdrop');
+
+    function showMobileSidebar() {
+        mobileOverlay.classList.remove('hidden');
+    }
+
+    function hideMobileSidebar() {
+        mobileOverlay.classList.add('hidden');
+    }
+
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', showMobileSidebar);
+    }
+
+    if (mobileClose) {
+        mobileClose.addEventListener('click', hideMobileSidebar);
+    }
+
+    if (mobileBackdrop) {
+        mobileBackdrop.addEventListener('click', hideMobileSidebar);
+    }
+});
+</script>
+{% endblock %}

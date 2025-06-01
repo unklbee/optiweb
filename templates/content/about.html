@@ -1,0 +1,144 @@
+<!-- templates/content/about.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <!-- Hero Section -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Tentang Kami</h1>
+        <p class="text-xl text-gray-600">Service laptop terpercaya dengan pengalaman bertahun-tahun</p>
+    </div>
+
+    <!-- Company Info -->
+    <div class="grid lg:grid-cols-2 gap-8 mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Profil Perusahaan</h2>
+            <div class="space-y-4 text-gray-600">
+                <p>
+                    {% if business_info %}{{ business_info.business_name }}{% else %}Service Laptop Bandung{% endif %}
+                    adalah penyedia layanan service dan reparasi laptop terpercaya di Bandung.
+                    Dengan pengalaman lebih dari 5 tahun, kami telah melayani ribuan customer
+                    dengan tingkat kepuasan yang tinggi.
+                </p>
+                <p>
+                    Tim teknisi kami terdiri dari profesional berpengalaman yang telah
+                    tersertifikasi dan terlatih untuk menangani berbagai jenis masalah laptop
+                    dari semua brand populer.
+                </p>
+                <p>
+                    Kami berkomitmen memberikan layanan berkualitas tinggi dengan harga yang
+                    terjangkau, didukung dengan garansi resmi untuk setiap pekerjaan yang kami lakukan.
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Visi & Misi</h2>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-600 mb-2">Visi</h3>
+                    <p class="text-gray-600">
+                        Menjadi penyedia layanan service laptop terdepan di Bandung yang
+                        dikenal dengan kualitas, kecepatan, dan kepercayaan.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-600 mb-2">Misi</h3>
+                    <ul class="text-gray-600 space-y-2">
+                        <li>• Memberikan layanan service laptop berkualitas tinggi</li>
+                        <li>• Menggunakan spare part original dan berkualitas</li>
+                        <li>• Memberikan garansi untuk setiap pekerjaan</li>
+                        <li>• Melayani customer dengan ramah dan profesional</li>
+                        <li>• Terus berinovasi dalam teknologi dan layanan</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us -->
+    <div class="bg-gray-50 rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Mengapa Memilih Kami?</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="text-center">
+                <div class="bg-blue-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-tie text-white text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Teknisi Berpengalaman</h3>
+                <p class="text-gray-600 text-sm">Tim teknisi dengan sertifikasi dan pengalaman 5+ tahun</p>
+            </div>
+
+            <div class="text-center">
+                <div class="bg-green-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Garansi Resmi</h3>
+                <p class="text-gray-600 text-sm">Garansi service hingga 3 bulan untuk kepuasan Anda</p>
+            </div>
+
+            <div class="text-center">
+                <div class="bg-yellow-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-clock text-white text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Pengerjaan Cepat</h3>
+                <p class="text-gray-600 text-sm">Estimasi pengerjaan 1-3 hari kerja</p>
+            </div>
+
+            <div class="text-center">
+                <div class="bg-purple-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-tools text-white text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Peralatan Lengkap</h3>
+                <p class="text-gray-600 text-sm">Fasilitas workshop modern dengan tools terkini</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Info -->
+    {% if business_info %}
+    <div class="bg-blue-50 rounded-lg p-6 text-center">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Hubungi Kami</h2>
+        <p class="text-gray-600 mb-6">Siap melayani Anda dengan sepenuh hati</p>
+
+        <div class="grid md:grid-cols-3 gap-4 mb-6">
+            <div class="text-center">
+                <i class="fas fa-map-marker-alt text-blue-600 text-2xl mb-2"></i>
+                <p class="font-semibold">Alamat</p>
+                <p class="text-gray-600 text-sm">{{ business_info.address }}</p>
+            </div>
+
+            <div class="text-center">
+                <i class="fas fa-phone text-blue-600 text-2xl mb-2"></i>
+                <p class="font-semibold">Telepon</p>
+                <p class="text-gray-600 text-sm">{{ business_info.phone }}</p>
+            </div>
+
+            <div class="text-center">
+                <i class="fas fa-envelope text-blue-600 text-2xl mb-2"></i>
+                <p class="font-semibold">Email</p>
+                <p class="text-gray-600 text-sm">{{ business_info.email }}</p>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="https://wa.me/{{ business_info.whatsapp }}"
+               target="_blank"
+               class="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <i class="fab fa-whatsapp mr-2"></i>
+                Chat WhatsApp
+            </a>
+            <a href="{% url 'content:contact' %}"
+               class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-envelope mr-2"></i>
+                Kirim Pesan
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

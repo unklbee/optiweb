@@ -1,0 +1,156 @@
+<!-- templates/content/testimonials.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Testimonial Customer</h1>
+        <p class="text-xl text-gray-600">Apa kata customer yang telah menggunakan layanan kami</p>
+
+        <!-- Rating Summary -->
+        {% if total_reviews > 0 %}
+        <div class="flex items-center justify-center mt-6">
+            <div class="bg-blue-50 rounded-lg p-6">
+                <div class="flex items-center justify-center mb-2">
+                    <span class="text-4xl font-bold text-blue-600">{{ avg_rating }}</span>
+                    <div class="ml-3">
+                        <div class="flex text-yellow-400 text-xl">
+                            {% for i in "12345"|make_list %}
+                                {% if i|add:0 <= avg_rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p class="text-gray-600 text-sm">dari {{ total_reviews }} review</p>
+                    </div>
+                </div>
+
+                <!-- Rating Distribution -->
+                <div class="space-y-2 mt-4">
+                    {% for rating, data in rating_distribution.items %}
+                    <div class="flex items-center text-sm">
+                        <span class="w-8">{{ rating }}★</span>
+                        <div class="flex-1 mx-3 bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-400 h-2 rounded-full"
+                                 style="width: {{ data.percentage }}%"></div>
+                        </div>
+                        <span class="w-8 text-gray-600">{{ data.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Testimonials Grid -->
+    {% if testimonials %}
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for testimonial in testimonials %}
+        <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">
+            <!-- Customer Info -->
+            <div class="flex items-center mb-4">
+                {% if testimonial.customer_photo %}
+                <img src="{{ testimonial.customer_photo.url }}"
+                     alt="{{ testimonial.customer_name }}"
+                     class="w-12 h-12 rounded-full object-cover mr-4">
+                {% else %}
+                <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold mr-4">
+                    {{ testimonial.customer_name|first|upper }}
+                </div>
+                {% endif %}
+
+                <div>
+                    <h3 class="font-semibold text-gray-800">{{ testimonial.customer_name }}</h3>
+                    <div class="flex items-center text-sm text-gray-500">
+                        {% if testimonial.customer_location %}
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        <span>{{ testimonial.customer_location }}</span>
+                        {% endif %}
+                        {% if testimonial.is_verified %}
+                        <span class="ml-2 text-green-600">
+                            <i class="fas fa-check-circle"></i> Verified
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="flex items-center mb-3">
+                <div class="flex text-yellow-400">
+                    {% for i in testimonial.get_star_range %}
+                    <i class="fas fa-star"></i>
+                    {% endfor %}
+                    {% for i in testimonial.get_empty_star_range %}
+                    <i class="far fa-star"></i>
+                    {% endfor %}
+                </div>
+                <span class="ml-2 text-sm text-gray-600">{{ testimonial.rating }}/5</span>
+            </div>
+
+            <!-- Service Info -->
+            {% if testimonial.laptop_brand or testimonial.service_type %}
+            <div class="flex flex-wrap gap-2 mb-3">
+                {% if testimonial.laptop_brand %}
+                <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+                    {{ testimonial.laptop_brand }}
+                </span>
+                {% endif %}
+                {% if testimonial.service_type %}
+                <span class="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">
+                    {{ testimonial.service_type }}
+                </span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Review Text -->
+            <blockquote class="text-gray-700 italic">
+                "{{ testimonial.review_text }}"
+            </blockquote>
+
+            <!-- Date -->
+            <div class="text-xs text-gray-500 mt-4">
+                {{ testimonial.created_at|date:"d M Y" }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <i class="fas fa-comments text-gray-400 text-6xl mb-4"></i>
+        <h3 class="text-xl text-gray-600 mb-2">Belum Ada Testimonial</h3>
+        <p class="text-gray-500">Jadilah yang pertama memberikan review!</p>
+    </div>
+    {% endif %}
+
+    <!-- CTA Section -->
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-8 text-white text-center mt-8">
+        <h2 class="text-2xl font-bold mb-4">Punya Pengalaman dengan Layanan Kami?</h2>
+        <p class="mb-6">Bagikan pengalaman Anda dan bantu customer lain membuat keputusan yang tepat</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% if business_info %}
+            <a href="https://wa.me/{{ business_info.whatsapp }}?text=Halo, saya ingin memberikan testimonial untuk layanan service laptop"
+               target="_blank"
+               class="inline-flex items-center justify-center px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors font-medium">
+                <i class="fab fa-whatsapp mr-2"></i>
+                Kirim Testimonial via WhatsApp
+            </a>
+            {% endif %}
+            <a href="{% url 'content:contact' %}"
+               class="inline-flex items-center justify-center px-6 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors font-medium">
+                <i class="fas fa-envelope mr-2"></i>
+                Kirim via Form Kontak
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+<!-- templates/services/detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ service.get_meta_title }}{% endblock %}
+{% block description %}{{ service.get_meta_description }}{% endblock %}
+{% block extra_schema %}
+    {% load schema_tags %}
+
+    <!-- Service Schema -->
+    {% service_schema service %}
+
+    <!-- Breadcrumb Schema -->
+    {% breadcrumb_schema breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-6">
+            <ol class="flex text-gray-500 text-sm">
+                <li><a href="{% url 'home' %}" class="hover:text-blue-600">Home</a></li>
+                <li class="mx-2">/</li>
+                <li><a href="{% url 'services:list' %}" class="hover:text-blue-600">Layanan</a></li>
+                {% if service.category %}
+                    <li class="mx-2">/</li>
+                    <li><a href="{% url 'services:category' service.category.slug %}"
+                           class="hover:text-blue-600">{{ service.category.name }}</a></li>
+                {% endif %}
+                <li class="mx-2">/</li>
+                <li class="text-gray-700">{{ service.name }}</li>
+            </ol>
+        </nav>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Service Image -->
+            <div>
+                {% if service.featured_image %}
+                    <img src="{{ service.featured_image.url }}"
+                         alt="{{ service.name }}"
+                         class="w-full rounded-lg shadow">
+                {% else %}
+                    <div class="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <span class="text-gray-500">No Image</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Service Info -->
+            <div>
+                {% if service.category %}
+                    <span class="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded mb-3">
+                {{ service.category.name }}
+            </span>
+                {% endif %}
+
+                <h1 class="text-3xl font-bold mb-4">{{ service.name }}</h1>
+                <p class="text-xl text-gray-600 mb-6">{{ service.short_description }}</p>
+
+                <!-- Pricing & Duration -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Harga</h4>
+                            <p class="text-2xl font-bold text-green-600">{{ service.get_price_range }}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Estimasi Waktu</h4>
+                            <p class="text-lg text-gray-600">{{ service.duration_estimate }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="space-y-3">
+                    {% if business_info %}
+                        <a href="https://wa.me/{{ business_info.whatsapp }}?text=Halo, saya ingin konsultasi tentang {{ service.name }}"
+                           target="_blank"
+                           class="block w-full text-center bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors">
+                            💬 Konsultasi via WhatsApp
+                        </a>
+                        <a href="tel:{{ business_info.phone }}"
+                           class="block w-full text-center bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                            📞 Telepon Sekarang
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Description -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Detail Layanan</h2>
+            <div class="prose max-w-none">
+                {{ service.description|safe }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Services -->
+    {% if related_services %}
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-6">Layanan Terkait</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                {% for related in related_services %}
+                    <div class="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                        <h3 class="text-lg font-semibold mb-2">{{ related.name }}</h3>
+                        <p class="text-gray-600 mb-3">{{ related.short_description|truncatewords:15 }}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-bold">{{ related.get_price_range }}</span>
+                            <a href="{{ related.get_absolute_url }}"
+                               class="text-blue-600 hover:underline">Lihat Detail</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
