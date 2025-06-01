@@ -4,277 +4,272 @@ templates/customers/loyalty.html
 
 {% extends 'customers/base_customer.html' %}
 {% load static %}
+{% load math_filters %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block customer_content %}
-<div class="space-y-6">
-    <!-- Loyalty Overview -->
-    <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold mb-2">Program Loyalty</h1>
-                <p class="text-purple-100">Kumpulkan points dan dapatkan reward menarik!</p>
-            </div>
-            <div class="text-center">
-                <div class="bg-white bg-opacity-20 rounded-lg p-4">
-                    <div class="text-3xl font-bold">{{ profile.total_points }}</div>
-                    <div class="text-purple-100 text-sm">Total Points</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Membership Progress -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Status Membership</h2>
-
-        <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center">
-                <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white mr-4">
-                    <i class="fas fa-star"></i>
-                </div>
+    <div class="space-y-6">
+        <!-- Loyalty Overview -->
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="font-semibold text-gray-900">{{ profile.membership_level }} Member</h3>
-                    <p class="text-gray-600 text-sm">Discount: {{ profile.get_discount_percentage }}%</p>
+                    <h1 class="text-2xl font-bold mb-2">Program Loyalty</h1>
+                    <p class="text-purple-100">Kumpulkan points dan dapatkan reward menarik!</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-white bg-opacity-20 rounded-lg p-4">
+                        <div class="text-3xl font-bold">{{ profile.total_points }}</div>
+                        <div class="text-purple-100 text-sm">Total Points</div>
+                    </div>
                 </div>
             </div>
-
-            {% if current_progress.next %}
-            <div class="text-right">
-                <p class="text-gray-600 text-sm">Next Level:</p>
-                <p class="font-semibold text-gray-900">{{ current_progress.next }}</p>
-            </div>
-            {% endif %}
         </div>
 
-        {% if current_progress.next %}
-        <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
-            {% if profile.membership_level == 'BRONZE' %}
-                {% with progress=profile.total_points|floatformat:0|add:0 %}
-                <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full"
-                     style="width: {{ progress|div:2000|mul:100|floatformat:1 }}%"></div>
-                {% endwith %}
-            {% elif profile.membership_level == 'SILVER' %}
-                {% with progress=profile.total_points|add:-2000 %}
-                <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full"
-                     style="width: {{ progress|div:3000|mul:100|floatformat:1 }}%"></div>
-                {% endwith %}
-            {% elif profile.membership_level == 'GOLD' %}
-                {% with progress=profile.total_points|add:-5000 %}
-                <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full"
-                     style="width: {{ progress|div:5000|mul:100|floatformat:1 }}%"></div>
-                {% endwith %}
-            {% endif %}
-        </div>
+        <!-- Membership Progress -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Status Membership</h2>
 
-        <div class="flex justify-between text-sm text-gray-600">
-            <span>{{ profile.total_points }} points</span>
-            <span>
-                {% if profile.membership_level == 'BRONZE' %}2,000 points (SILVER)
-                {% elif profile.membership_level == 'SILVER' %}5,000 points (GOLD)
-                {% elif profile.membership_level == 'GOLD' %}10,000 points (PLATINUM)
-                {% endif %}
-            </span>
-        </div>
-        {% else %}
-        <div class="bg-gold-100 border border-yellow-400 rounded-lg p-4">
-            <div class="flex items-center">
-                <i class="fas fa-crown text-yellow-600 mr-3"></i>
-                <span class="text-yellow-800 font-medium">Selamat! Anda sudah mencapai level tertinggi.</span>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Available Rewards -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Reward Tersedia</h2>
-
-        {% if redeemable_rewards %}
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            {% for reward in redeemable_rewards %}
-            <div class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-semibold text-gray-900">{{ reward.name }}</h3>
-                    <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
-                        {{ reward.points_required }} pts
-                    </span>
-                </div>
-
-                <p class="text-gray-600 text-sm mb-4">{{ reward.description }}</p>
-
-                <div class="space-y-2 mb-4">
-                    {% if reward.reward_type == 'DISCOUNT' %}
-                    <div class="flex items-center text-sm">
-                        <i class="fas fa-percentage text-green-600 mr-2"></i>
-                        <span>{{ reward.discount_percentage }}% discount</span>
-                    </div>
-                    {% elif reward.reward_type == 'FIXED_AMOUNT' %}
-                    <div class="flex items-center text-sm">
-                        <i class="fas fa-money-bill text-green-600 mr-2"></i>
-                        <span>Rp {{ reward.discount_amount|floatformat:0 }} off</span>
-                    </div>
-                    {% endif %}
-
-                    {% if reward.minimum_order_value > 0 %}
-                    <div class="flex items-center text-sm text-gray-500">
-                        <i class="fas fa-shopping-cart mr-2"></i>
-                        <span>Min. order Rp {{ reward.minimum_order_value|floatformat:0 }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <a href="{% url 'customers:redeem_reward' reward.id %}"
-                   class="block w-full text-center bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                    Tukar Sekarang
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        <!-- All Available Rewards -->
-        {% if available_rewards %}
-        <div class="border-t border-gray-200 pt-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Semua Reward</h3>
-            <div class="space-y-4">
-                {% for reward in available_rewards %}
-                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg {% if reward.points_required > profile.total_points %}opacity-60{% endif %}">
-                    <div class="flex-1">
-                        <h4 class="font-medium text-gray-900">{{ reward.name }}</h4>
-                        <p class="text-gray-600 text-sm">{{ reward.description|truncatewords:15 }}</p>
-                    </div>
-
-                    <div class="text-right ml-4">
-                        <div class="text-purple-600 font-bold">{{ reward.points_required }} pts</div>
-                        {% if reward.points_required <= profile.total_points %}
-                        <a href="{% url 'customers:redeem_reward' reward.id %}"
-                           class="text-purple-600 hover:text-purple-800 text-sm font-medium">
-                            Tukar
-                        </a>
-                        {% else %}
-                        <span class="text-gray-500 text-sm">
-                            Butuh {{ reward.points_required|sub:profile.total_points }} pts lagi
-                        </span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% else %}
-        <div class="text-center py-8">
-            <i class="fas fa-gift text-gray-400 text-4xl mb-4"></i>
-            <h3 class="text-lg text-gray-600 mb-2">Belum Ada Reward</h3>
-            <p class="text-gray-500">Reward akan segera tersedia!</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Point History -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Riwayat Points</h2>
-
-        {% if point_transactions %}
-        <div class="space-y-4">
-            {% for transaction in point_transactions %}
-            <div class="flex items-center justify-between p-4 border-l-4 {% if transaction.points > 0 %}border-green-500 bg-green-50{% else %}border-red-500 bg-red-50{% endif %}">
+            <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center">
-                    <div class="mr-4">
-                        {% if transaction.points > 0 %}
-                        <i class="fas fa-plus-circle text-green-600"></i>
-                        {% else %}
-                        <i class="fas fa-minus-circle text-red-600"></i>
-                        {% endif %}
+                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white mr-4">
+                        <i class="fas fa-star"></i>
                     </div>
                     <div>
-                        <h4 class="font-medium text-gray-900">{{ transaction.get_transaction_type_display }}</h4>
-                        <p class="text-gray-600 text-sm">{{ transaction.reason }}</p>
-                        <p class="text-gray-500 text-xs">{{ transaction.created_at|date:"d M Y H:i" }}</p>
+                        <h3 class="font-semibold text-gray-900">{{ profile.membership_level }} Member</h3>
+                        <p class="text-gray-600 text-sm">Discount: {{ profile.get_discount_percentage }}%</p>
                     </div>
                 </div>
 
-                <div class="text-right">
+                {% if current_progress.next %}
+                    <div class="text-right">
+                        <p class="text-gray-600 text-sm">Next Level:</p>
+                        <p class="font-semibold text-gray-900">{{ current_progress.next }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if profile.membership_level != 'PLATINUM' %}
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                    {% if profile.membership_level == 'BRONZE' %}
+                        <!-- Progress Bronze ke Silver: 0-2000 points -->
+                        <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full"
+                             style="width: {{ profile.total_points|percentage:2000|floatformat:1 }}%"></div>
+                    {% elif profile.membership_level == 'SILVER' %}
+                        <!-- Progress Silver ke Gold: 2000-5000 points -->
+                        {% with current_progress=profile.total_points|subtract:2000 %}
+                            <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full"
+                                 style="width: {{ current_progress|percentage:3000|floatformat:1 }}%"></div>
+                        {% endwith %}
+                    {% elif profile.membership_level == 'GOLD' %}
+                        <!-- Progress Gold ke Platinum: 5000-10000 points -->
+                        {% with current_progress=profile.total_points|subtract:5000 %}
+                            <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full"
+                                 style="width: {{ current_progress|percentage:5000|floatformat:1 }}%"></div>
+                        {% endwith %}
+                    {% endif %}
+                </div>
+
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>{{ profile.total_points }} points</span>
+                    <span>
+                        {% if profile.membership_level == 'BRONZE' %}2,000 points (SILVER)
+                        {% elif profile.membership_level == 'SILVER' %}5,000 points (GOLD)
+                        {% elif profile.membership_level == 'GOLD' %}10,000 points (PLATINUM)
+                        {% endif %}
+                    </span>
+                </div>
+            {% else %}
+                <div class="bg-yellow-100 border border-yellow-400 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-crown text-yellow-600 mr-3"></i>
+                        <span class="text-yellow-800 font-medium">Selamat! Anda sudah mencapai level tertinggi.</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Available Rewards -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Reward Tersedia</h2>
+
+            {% if redeemable_rewards %}
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    {% for reward in redeemable_rewards %}
+                        <div class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-gray-900">{{ reward.name }}</h3>
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {{ reward.points_required }} pts
+                    </span>
+                            </div>
+
+                            <p class="text-gray-600 text-sm mb-4">{{ reward.description }}</p>
+
+                            <div class="space-y-2 mb-4">
+                                {% if reward.reward_type == 'DISCOUNT' %}
+                                    <div class="flex items-center text-sm">
+                                        <i class="fas fa-percentage text-green-600 mr-2"></i>
+                                        <span>{{ reward.discount_percentage }}% discount</span>
+                                    </div>
+                                {% elif reward.reward_type == 'FIXED_AMOUNT' %}
+                                    <div class="flex items-center text-sm">
+                                        <i class="fas fa-money-bill text-green-600 mr-2"></i>
+                                        <span>Rp {{ reward.discount_amount|floatformat:0 }} off</span>
+                                    </div>
+                                {% endif %}
+
+                                {% if reward.minimum_order_value > 0 %}
+                                    <div class="flex items-center text-sm text-gray-500">
+                                        <i class="fas fa-shopping-cart mr-2"></i>
+                                        <span>Min. order Rp {{ reward.minimum_order_value|floatformat:0 }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <a href="{% url 'customers:redeem_reward' reward.id %}"
+                               class="block w-full text-center bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                                Tukar Sekarang
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if available_rewards %}
+                <div class="border-t border-gray-200 pt-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Semua Reward</h3>
+                    <div class="space-y-4">
+                        {% for reward in available_rewards %}
+                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg {% if reward.points_required > profile.total_points %}opacity-60{% endif %}">
+                                <div class="flex-1">
+                                    <h4 class="font-medium text-gray-900">{{ reward.name }}</h4>
+                                    <p class="text-gray-600 text-sm">{{ reward.description|truncatewords:15 }}</p>
+                                </div>
+
+                                <div class="text-right ml-4">
+                                    <div class="text-purple-600 font-bold">{{ reward.points_required }} pts</div>
+                                    {% if reward.points_required <= profile.total_points %}
+                                        <a href="{% url 'customers:redeem_reward' reward.id %}"
+                                           class="text-purple-600 hover:text-purple-800 text-sm font-medium">
+                                            Tukar
+                                        </a>
+                                    {% else %}
+                                        <span class="text-gray-500 text-sm">
+                                            Butuh {{ reward.points_required|subtract:profile.total_points }} pts lagi
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Point History -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Riwayat Points</h2>
+
+            {% if point_transactions %}
+                <div class="space-y-4">
+                    {% for transaction in point_transactions %}
+                        <div class="flex items-center justify-between p-4 border-l-4 {% if transaction.points > 0 %}border-green-500 bg-green-50{% else %}border-red-500 bg-red-50{% endif %}">
+                            <div class="flex items-center">
+                                <div class="mr-4">
+                                    {% if transaction.points > 0 %}
+                                        <i class="fas fa-plus-circle text-green-600"></i>
+                                    {% else %}
+                                        <i class="fas fa-minus-circle text-red-600"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900">{{ transaction.get_transaction_type_display }}</h4>
+                                    <p class="text-gray-600 text-sm">{{ transaction.reason }}</p>
+                                    <p class="text-gray-500 text-xs">{{ transaction.created_at|date:"d M Y H:i" }}</p>
+                                </div>
+                            </div>
+
+                            <div class="text-right">
                     <span class="font-bold {% if transaction.points > 0 %}text-green-600{% else %}text-red-600{% endif %}">
                         {% if transaction.points > 0 %}+{% endif %}{{ transaction.points }} pts
                     </span>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center py-8">
-            <i class="fas fa-history text-gray-400 text-4xl mb-4"></i>
-            <h3 class="text-lg text-gray-600 mb-2">Belum Ada Transaksi Points</h3>
-            <p class="text-gray-500">Transaksi points akan muncul di sini</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Redemption History -->
-    {% if redemptions %}
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Riwayat Penukaran Reward</h2>
-
-        <div class="space-y-4">
-            {% for redemption in redemptions %}
-            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
-                    <h4 class="font-medium text-gray-900">{{ redemption.reward.name }}</h4>
-                    <p class="text-gray-600 text-sm">Kode: {{ redemption.redemption_code }}</p>
-                    <p class="text-gray-500 text-xs">{{ redemption.created_at|date:"d M Y H:i" }}</p>
+            {% else %}
+                <div class="text-center py-8">
+                    <i class="fas fa-history text-gray-400 text-4xl mb-4"></i>
+                    <h3 class="text-lg text-gray-600 mb-2">Belum Ada Transaksi Points</h3>
+                    <p class="text-gray-500">Transaksi points akan muncul di sini</p>
                 </div>
+            {% endif %}
+        </div>
 
-                <div class="text-right">
-                    <div class="text-purple-600 font-bold">-{{ redemption.points_used }} pts</div>
-                    <span class="text-xs px-2 py-1 rounded {% if redemption.is_used %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+        <!-- Redemption History -->
+        {% if redemptions %}
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">Riwayat Penukaran Reward</h2>
+
+                <div class="space-y-4">
+                    {% for redemption in redemptions %}
+                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                            <div>
+                                <h4 class="font-medium text-gray-900">{{ redemption.reward.name }}</h4>
+                                <p class="text-gray-600 text-sm">Kode: {{ redemption.redemption_code }}</p>
+                                <p class="text-gray-500 text-xs">{{ redemption.created_at|date:"d M Y H:i" }}</p>
+                            </div>
+
+                            <div class="text-right">
+                                <div class="text-purple-600 font-bold">-{{ redemption.points_used }} pts</div>
+                                <span class="text-xs px-2 py-1 rounded {% if redemption.is_used %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
                         {% if redemption.is_used %}Sudah Digunakan{% else %}Belum Digunakan{% endif %}
                     </span>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
+        {% endif %}
+
+        <!-- How to Earn Points -->
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Cara Mendapatkan Points</h2>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="text-center">
+                    <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
+                        <i class="fas fa-laptop text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-1">Service Laptop</h3>
+                    <p class="text-gray-600 text-sm">100+ points setiap service</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
+                        <i class="fas fa-star text-yellow-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-1">Review & Rating</h3>
+                    <p class="text-gray-600 text-sm">50 points per review</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
+                        <i class="fas fa-users text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-1">Referral Teman</h3>
+                    <p class="text-gray-600 text-sm">200 points per referral</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
+                        <i class="fas fa-calendar text-purple-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-1">Bonus Bulanan</h3>
+                    <p class="text-gray-600 text-sm">Bonus points aktif member</p>
+                </div>
+            </div>
         </div>
     </div>
-    {% endif %}
-
-    <!-- How to Earn Points -->
-    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Cara Mendapatkan Points</h2>
-
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="text-center">
-                <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
-                    <i class="fas fa-laptop text-blue-600 text-xl"></i>
-                </div>
-                <h3 class="font-medium text-gray-900 mb-1">Service Laptop</h3>
-                <p class="text-gray-600 text-sm">100+ points setiap service</p>
-            </div>
-
-            <div class="text-center">
-                <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
-                    <i class="fas fa-star text-yellow-600 text-xl"></i>
-                </div>
-                <h3 class="font-medium text-gray-900 mb-1">Review & Rating</h3>
-                <p class="text-gray-600 text-sm">50 points per review</p>
-            </div>
-
-            <div class="text-center">
-                <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
-                    <i class="fas fa-users text-green-600 text-xl"></i>
-                </div>
-                <h3 class="font-medium text-gray-900 mb-1">Referral Teman</h3>
-                <p class="text-gray-600 text-sm">200 points per referral</p>
-            </div>
-
-            <div class="text-center">
-                <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
-                    <i class="fas fa-calendar text-purple-600 text-xl"></i>
-                </div>
-                <h3 class="font-medium text-gray-900 mb-1">Bonus Bulanan</h3>
-                <p class="text-gray-600 text-sm">Bonus points aktif member</p>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}

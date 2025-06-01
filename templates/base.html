@@ -90,7 +90,7 @@
             <div class="flex justify-between items-center">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="{% url 'home' %}" class="text-2xl font-bold">
+                    <a href="{% url 'home' %}" class="text-2xl font-bold hover:text-blue-200 transition-colors">
                         {% if business_info %}
                             {{ business_info.business_name }}
                         {% else %}
@@ -100,27 +100,33 @@
                 </div>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex space-x-6">
-                    <a href="{% url 'home' %}" class="hover:text-blue-200 transition-colors">Beranda</a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <!-- Main Menu Items -->
+                    <a href="{% url 'home' %}"
+                       class="hover:text-blue-200 transition-colors font-medium">
+                       Beranda
+                    </a>
 
-                    <!-- Services Dropdown with JavaScript -->
+                    <!-- Services Dropdown -->
                     <div class="relative" id="services-dropdown">
-                        <button class="hover:text-blue-200 transition-colors flex items-center focus:outline-none"
+                        <button class="hover:text-blue-200 transition-colors flex items-center focus:outline-none font-medium"
                                 id="services-button">
-                            Layanan <i class="fas fa-chevron-down ml-1 transform transition-transform duration-200"
-                                       id="services-icon"></i>
+                            Layanan
+                            <i class="fas fa-chevron-down ml-1 transform transition-transform duration-200"
+                               id="services-icon"></i>
                         </button>
                         <div class="absolute top-full left-0 mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-lg opacity-0 invisible transform scale-95 transition-all duration-200 z-50"
                              id="services-menu">
                             <div class="p-4">
                                 <a href="{% url 'services:list' %}"
-                                   class="block py-2 px-3 hover:bg-blue-50 rounded transition-colors">
-                                    Semua Layanan
+                                   class="block py-2 px-3 hover:bg-blue-50 rounded transition-colors font-medium text-blue-600">
+                                    <i class="fas fa-list mr-2"></i>Semua Layanan
                                 </a>
+                                <hr class="my-2 border-gray-200">
                                 {% for category in nav_service_categories %}
                                     <a href="{% url 'services:category' category.slug %}"
                                        class="block py-2 px-3 hover:bg-blue-50 rounded transition-colors">
-                                        {% if category.icon %}<i class="{{ category.icon }} mr-2"></i>{% endif %}
+                                        {% if category.icon %}<i class="{{ category.icon }} mr-2 text-blue-500"></i>{% endif %}
                                         {{ category.name }}
                                     </a>
                                 {% endfor %}
@@ -128,59 +134,99 @@
                         </div>
                     </div>
 
-                    <!-- Blog -->
-                    <a href="{% url 'content:blog_list' %}" class="hover:text-blue-200 transition-colors">Blog</a>
-                    <!-- FAQ -->
-                    <a href="{% url 'content:faq' %}" class="hover:text-blue-200 transition-colors">FAQ</a>
-                    <!-- Testimonial -->
-                    <a href="{% url 'content:testimonials' %}"
-                       class="hover:text-blue-200 transition-colors">Testimonial</a>
-                    <!-- Tentang Kami - fix this -->
-                    <a href="{% url 'content:about' %}" class="hover:text-blue-200 transition-colors">Tentang Kami</a>
-                    <!-- Contact - fix this -->
-                    <a href="{% url 'content:contact' %}" class="hover:text-blue-200 transition-colors">Kontak</a>
+                    <a href="{% url 'content:blog_list' %}"
+                       class="hover:text-blue-200 transition-colors font-medium">
+                       Blog
+                    </a>
 
+                    <a href="{% url 'content:faq' %}"
+                       class="hover:text-blue-200 transition-colors font-medium">
+                       FAQ
+                    </a>
+
+                    <a href="{% url 'content:testimonials' %}"
+                       class="hover:text-blue-200 transition-colors font-medium">
+                       Testimonial
+                    </a>
+
+                    <a href="{% url 'content:about' %}"
+                       class="hover:text-blue-200 transition-colors font-medium">
+                       Tentang Kami
+                    </a>
+
+                    <a href="{% url 'content:contact' %}"
+                       class="hover:text-blue-200 transition-colors font-medium">
+                       Kontak
+                    </a>
+
+                    <!-- User Menu / Auth -->
                     {% if user.is_authenticated %}
-                        <div class="relative group">
-                            <button class="hover:text-blue-200 transition-colors flex items-center">
-                                <i class="fas fa-user mr-1"></i>
-                                {{ user.get_full_name|default:user.username }}
-                                <i class="fas fa-chevron-down ml-1"></i>
+                        <div class="relative ml-4" id="user-dropdown">
+                            <button class="hover:text-blue-200 transition-colors flex items-center focus:outline-none bg-blue-700 bg-opacity-50 px-3 py-2 rounded-lg"
+                                    id="user-button">
+                                <div class="bg-white bg-opacity-20 rounded-full w-8 h-8 flex items-center justify-center mr-2">
+                                    <i class="fas fa-user text-sm"></i>
+                                </div>
+                                <span class="font-medium">{{ user.get_full_name|default:user.username }}</span>
+                                <i class="fas fa-chevron-down ml-2 transform transition-transform duration-200"
+                                   id="user-icon"></i>
                             </button>
-                            <div class="absolute top-full right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                <div class="p-2">
-                                    <a href="{% url 'customers:dashboard' %}" class="block py-2 px-3 hover:bg-blue-50 rounded">
-                                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                            <div class="absolute top-full right-0 mt-2 w-52 bg-white text-gray-800 rounded-lg shadow-lg opacity-0 invisible transform scale-95 transition-all duration-200 z-50"
+                                 id="user-menu">
+                                <div class="p-3">
+                                    <!-- User Info Header -->
+                                    <div class="px-3 py-2 border-b border-gray-200 mb-2">
+                                        <p class="font-semibold text-gray-900">{{ user.get_full_name|default:user.username }}</p>
+                                        <p class="text-xs text-gray-500">{{ user.email }}</p>
+                                        {% if user.customerprofile %}
+                                        <p class="text-xs text-blue-600 font-medium">{{ user.customerprofile.membership_level }} Member</p>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Menu Items -->
+                                    <a href="{% url 'customers:dashboard' %}"
+                                       class="flex items-center py-2 px-3 hover:bg-blue-50 rounded transition-colors">
+                                        <i class="fas fa-tachometer-alt mr-3 text-blue-500 w-4"></i>Dashboard
                                     </a>
-                                    <a href="{% url 'customers:orders' %}" class="block py-2 px-3 hover:bg-blue-50 rounded">
-                                        <i class="fas fa-list mr-2"></i>Order Saya
+                                    <a href="{% url 'customers:orders' %}"
+                                       class="flex items-center py-2 px-3 hover:bg-blue-50 rounded transition-colors">
+                                        <i class="fas fa-list mr-3 text-green-500 w-4"></i>Order Saya
                                     </a>
-                                    <a href="{% url 'customers:loyalty' %}" class="block py-2 px-3 hover:bg-blue-50 rounded">
-                                        <i class="fas fa-star mr-2"></i>Program Loyalty
+                                    <a href="{% url 'customers:loyalty' %}"
+                                       class="flex items-center py-2 px-3 hover:bg-blue-50 rounded transition-colors">
+                                        <i class="fas fa-star mr-3 text-yellow-500 w-4"></i>Program Loyalty
                                     </a>
-                                    <a href="{% url 'customers:profile' %}" class="block py-2 px-3 hover:bg-blue-50 rounded">
-                                        <i class="fas fa-user-edit mr-2"></i>Profile
+                                    <a href="{% url 'customers:profile' %}"
+                                       class="flex items-center py-2 px-3 hover:bg-blue-50 rounded transition-colors">
+                                        <i class="fas fa-user-edit mr-3 text-purple-500 w-4"></i>Profile
                                     </a>
-                                    <hr class="my-2">
-                                    <a href="{% url 'customers:logout' %}" class="block py-2 px-3 hover:bg-red-50 rounded text-red-600">
-                                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+
+                                    <hr class="my-2 border-gray-200">
+
+                                    <a href="{% url 'customers:logout' %}"
+                                       class="flex items-center py-2 px-3 hover:bg-red-50 rounded transition-colors text-red-600">
+                                        <i class="fas fa-sign-out-alt mr-3 w-4"></i>Logout
                                     </a>
                                 </div>
                             </div>
                         </div>
                     {% else %}
-                        <a href="{% url 'customers:login' %}" class="hover:text-blue-200 transition-colors">
-                            <i class="fas fa-sign-in-alt mr-1"></i>Login
-                        </a>
-                        <a href="{% url 'customers:register' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                            <i class="fas fa-user-plus mr-1"></i>Daftar
-                        </a>
+                        <div class="flex items-center space-x-3 ml-4 pl-4 border-l border-blue-500">
+                            <a href="{% url 'customers:login' %}"
+                               class="hover:text-blue-200 transition-colors font-medium">
+                                <i class="fas fa-sign-in-alt mr-1"></i>Login
+                            </a>
+                            <a href="{% url 'customers:register' %}"
+                               class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium shadow-sm">
+                                <i class="fas fa-user-plus mr-1"></i>Daftar
+                            </a>
+                        </div>
                     {% endif %}
                 </div>
 
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
-                    <button id="mobile-menu-btn" class="text-white">
+                    <button id="mobile-menu-btn" class="text-white hover:text-blue-200 transition-colors p-2">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
@@ -188,20 +234,81 @@
 
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="md:hidden mt-4 pb-4 hidden">
-                <div class="space-y-2">
-                    <a href="{% url 'home' %}" class="block py-2 hover:text-blue-200">Beranda</a>
-                    <a href="{% url 'services:list' %}" class="block py-2 hover:text-blue-200">Semua Layanan</a>
-                    {% for category in nav_service_categories %}
-                        <a href="{% url 'services:category' category.slug %}"
-                           class="block py-2 pl-4 hover:text-blue-200">
-                            {{ category.name }}
+                <div class="space-y-1">
+                    <a href="{% url 'home' %}"
+                       class="block py-3 px-4 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                       <i class="fas fa-home mr-3 w-5"></i>Beranda
+                    </a>
+
+                    <!-- Mobile Services -->
+                    <div class="border-t border-blue-500 pt-2 mt-2">
+                        <p class="px-4 py-2 text-blue-200 text-sm font-medium uppercase tracking-wide">Layanan</p>
+                        <a href="{% url 'services:list' %}"
+                           class="block py-2 px-6 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                           <i class="fas fa-list mr-3 w-5"></i>Semua Layanan
                         </a>
-                    {% endfor %}
-                    <a href="{% url 'content:blog_list' %}" class="block py-2 hover:text-blue-200">Blog</a>
-                    <a href="{% url 'content:faq' %}" class="block py-2 hover:text-blue-200">FAQ</a>
-                    <a href="{% url 'content:testimonials' %}" class="block py-2 hover:text-blue-200">Testimonial</a>
-                    <a href="{% url 'content:about' %}" class="block py-2 hover:text-blue-200">Tentang Kami</a>
-                    <a href="{% url 'content:contact' %}" class="block py-2 hover:text-blue-200">Kontak</a>
+                        {% for category in nav_service_categories %}
+                            <a href="{% url 'services:category' category.slug %}"
+                               class="block py-2 px-6 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                                {% if category.icon %}<i class="{{ category.icon }} mr-3 w-5"></i>{% endif %}
+                                {{ category.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Mobile Other Pages -->
+                    <div class="border-t border-blue-500 pt-2 mt-2">
+                        <a href="{% url 'content:blog_list' %}"
+                           class="block py-3 px-4 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                           <i class="fas fa-blog mr-3 w-5"></i>Blog
+                        </a>
+                        <a href="{% url 'content:faq' %}"
+                           class="block py-3 px-4 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                           <i class="fas fa-question-circle mr-3 w-5"></i>FAQ
+                        </a>
+                        <a href="{% url 'content:testimonials' %}"
+                           class="block py-3 px-4 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                           <i class="fas fa-comments mr-3 w-5"></i>Testimonial
+                        </a>
+                        <a href="{% url 'content:about' %}"
+                           class="block py-3 px-4 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                           <i class="fas fa-info-circle mr-3 w-5"></i>Tentang Kami
+                        </a>
+                        <a href="{% url 'content:contact' %}"
+                           class="block py-3 px-4 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                           <i class="fas fa-envelope mr-3 w-5"></i>Kontak
+                        </a>
+                    </div>
+
+                    <!-- Mobile Auth -->
+                    {% if user.is_authenticated %}
+                        <div class="border-t border-blue-500 pt-2 mt-2">
+                            <p class="px-4 py-2 text-blue-200 text-sm font-medium">{{ user.get_full_name|default:user.username }}</p>
+                            <a href="{% url 'customers:dashboard' %}"
+                               class="block py-2 px-6 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                               <i class="fas fa-tachometer-alt mr-3 w-5"></i>Dashboard
+                            </a>
+                            <a href="{% url 'customers:orders' %}"
+                               class="block py-2 px-6 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                               <i class="fas fa-list mr-3 w-5"></i>Order Saya
+                            </a>
+                            <a href="{% url 'customers:logout' %}"
+                               class="block py-2 px-6 hover:bg-red-600 hover:bg-opacity-50 rounded transition-colors text-red-200">
+                               <i class="fas fa-sign-out-alt mr-3 w-5"></i>Logout
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="border-t border-blue-500 pt-2 mt-2">
+                            <a href="{% url 'customers:login' %}"
+                               class="block py-3 px-4 hover:bg-blue-700 hover:bg-opacity-50 rounded transition-colors">
+                               <i class="fas fa-sign-in-alt mr-3 w-5"></i>Login
+                            </a>
+                            <a href="{% url 'customers:register' %}"
+                               class="block py-3 px-4 bg-green-600 hover:bg-green-700 rounded transition-colors mx-4 text-center font-medium">
+                               <i class="fas fa-user-plus mr-2"></i>Daftar Sekarang
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </nav>
@@ -367,6 +474,140 @@
             }
         }
     });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', function () {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function (event) {
+            if (!mobileMenuBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    }
+
+    // Desktop Services Dropdown
+    const servicesButton = document.getElementById('services-button');
+    const servicesMenu = document.getElementById('services-menu');
+    const servicesIcon = document.getElementById('services-icon');
+    const servicesDropdown = document.getElementById('services-dropdown');
+
+    if (servicesButton && servicesMenu) {
+        let isServicesOpen = false;
+
+        // Toggle dropdown on button click
+        servicesButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            toggleServicesDropdown();
+        });
+
+        // Show dropdown on hover
+        servicesDropdown.addEventListener('mouseenter', function () {
+            if (!isServicesOpen) {
+                showServicesDropdown();
+            }
+        });
+
+        // Hide dropdown when mouse leaves
+        servicesDropdown.addEventListener('mouseleave', function () {
+            hideServicesDropdown();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            if (!servicesDropdown.contains(event.target)) {
+                hideServicesDropdown();
+            }
+        });
+
+        function toggleServicesDropdown() {
+            if (isServicesOpen) {
+                hideServicesDropdown();
+            } else {
+                showServicesDropdown();
+            }
+        }
+
+        function showServicesDropdown() {
+            isServicesOpen = true;
+            servicesMenu.classList.remove('opacity-0', 'invisible', 'scale-95');
+            servicesMenu.classList.add('opacity-100', 'visible', 'scale-100');
+            servicesIcon.style.transform = 'rotate(180deg)';
+        }
+
+        function hideServicesDropdown() {
+            isServicesOpen = false;
+            servicesMenu.classList.remove('opacity-100', 'visible', 'scale-100');
+            servicesMenu.classList.add('opacity-0', 'invisible', 'scale-95');
+            servicesIcon.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Desktop User Dropdown
+    const userButton = document.getElementById('user-button');
+    const userMenu = document.getElementById('user-menu');
+    const userIcon = document.getElementById('user-icon');
+    const userDropdown = document.getElementById('user-dropdown');
+
+    if (userButton && userMenu) {
+        let isUserOpen = false;
+
+        // Toggle dropdown on button click
+        userButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            toggleUserDropdown();
+        });
+
+        // Show dropdown on hover
+        userDropdown.addEventListener('mouseenter', function () {
+            if (!isUserOpen) {
+                showUserDropdown();
+            }
+        });
+
+        // Hide dropdown when mouse leaves
+        userDropdown.addEventListener('mouseleave', function () {
+            hideUserDropdown();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            if (!userDropdown.contains(event.target)) {
+                hideUserDropdown();
+            }
+        });
+
+        function toggleUserDropdown() {
+            if (isUserOpen) {
+                hideUserDropdown();
+            } else {
+                showUserDropdown();
+            }
+        }
+
+        function showUserDropdown() {
+            isUserOpen = true;
+            userMenu.classList.remove('opacity-0', 'invisible', 'scale-95');
+            userMenu.classList.add('opacity-100', 'visible', 'scale-100');
+            userIcon.style.transform = 'rotate(180deg)';
+        }
+
+        function hideUserDropdown() {
+            isUserOpen = false;
+            userMenu.classList.remove('opacity-100', 'visible', 'scale-100');
+            userMenu.classList.add('opacity-0', 'invisible', 'scale-95');
+            userIcon.style.transform = 'rotate(0deg)';
+        }
+    }
+});
 </script>
 </body>
 </html>
