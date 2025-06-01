@@ -22,8 +22,8 @@ templates/customers/dashboard.html
                 <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-lg">
                     <div class="text-center">
                         <p class="text-blue-100 text-sm">Member Status</p>
-                        <p class="text-xl font-bold">{{ profile.membership_level }}</p>
-                        <p class="text-blue-100 text-sm">{{ profile.total_points }} Points</p>
+                        <p class="text-xl font-bold">{{ profile.membership_level|default:"BRONZE" }}</p>
+                        <p class="text-blue-100 text-sm">{{ profile.total_points|default:0 }} Points</p>
                     </div>
                 </div>
             </div>
@@ -39,7 +39,7 @@ templates/customers/dashboard.html
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Total Order</h3>
-                    <p class="text-2xl font-bold text-gray-900">{{ total_orders }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ total_orders|default:0 }}</p>
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@ templates/customers/dashboard.html
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Order Aktif</h3>
-                    <p class="text-2xl font-bold text-gray-900">{{ active_orders }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ active_orders|default:0 }}</p>
                 </div>
             </div>
         </div>
@@ -63,7 +63,7 @@ templates/customers/dashboard.html
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Selesai</h3>
-                    <p class="text-2xl font-bold text-gray-900">{{ completed_orders }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ completed_orders|default:0 }}</p>
                 </div>
             </div>
         </div>
@@ -75,7 +75,7 @@ templates/customers/dashboard.html
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Points</h3>
-                    <p class="text-2xl font-bold text-gray-900">{{ profile.total_points }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ profile.total_points|default:0 }}</p>
                 </div>
             </div>
         </div>
@@ -120,128 +120,82 @@ templates/customers/dashboard.html
         </div>
     </div>
 
-    <!-- Recent Orders & Available Rewards -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Recent Orders -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-gray-900">Order Terbaru</h2>
-                <a href="{% url 'customers:orders' %}" class="text-blue-600 hover:text-blue-800 text-sm">
-                    Lihat Semua
-                </a>
-            </div>
-
-            {% if recent_orders %}
-            <div class="space-y-4">
-                {% for order in recent_orders %}
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-semibold text-gray-900">{{ order.order_number }}</h3>
-                        <span class="px-2 py-1 text-xs rounded-full
-                                   {% if order.status == 'COMPLETED' %}bg-green-100 text-green-800
-                                   {% elif order.status == 'IN_PROGRESS' %}bg-blue-100 text-blue-800
-                                   {% elif order.status == 'PENDING' %}bg-yellow-100 text-yellow-800
-                                   {% else %}bg-gray-100 text-gray-800{% endif %}">
-                            {{ order.get_status_display }}
-                        </span>
-                    </div>
-                    <p class="text-gray-600 text-sm">{{ order.service.name }}</p>
-                    <p class="text-gray-500 text-xs">{{ order.device_brand }} {{ order.device_model }}</p>
-                    <div class="mt-2">
-                        <a href="{% url 'customers:order_detail' order.order_number %}"
-                           class="text-blue-600 hover:text-blue-800 text-sm">
-                            Lihat Detail →
-                        </a>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="text-center py-8">
-                <i class="fas fa-inbox text-gray-400 text-4xl mb-4"></i>
-                <p class="text-gray-500">Belum ada order</p>
-                <a href="{% url 'customers:create_order' %}"
-                   class="text-blue-600 hover:text-blue-800 text-sm">
-                    Buat order pertama Anda
-                </a>
-            </div>
-            {% endif %}
+    <!-- Recent Orders (if any) -->
+    {% if recent_orders %}
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-900">Order Terbaru</h2>
+            <a href="{% url 'customers:orders' %}" class="text-blue-600 hover:text-blue-800 text-sm">
+                Lihat Semua
+            </a>
         </div>
 
-        <!-- Available Rewards -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-gray-900">Reward Tersedia</h2>
-                <a href="{% url 'customers:loyalty' %}" class="text-blue-600 hover:text-blue-800 text-sm">
-                    Lihat Semua
-                </a>
-            </div>
-
-            {% if available_rewards %}
-            <div class="space-y-4">
-                {% for reward in available_rewards %}
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-semibold text-gray-900">{{ reward.name }}</h3>
-                        <span class="text-purple-600 font-bold">{{ reward.points_required }} pts</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-2">{{ reward.description|truncatewords:15 }}</p>
-                    {% if reward.points_required <= profile.total_points %}
-                    <a href="{% url 'customers:redeem_reward' reward.id %}"
-                       class="inline-block bg-purple-600 text-white px-4 py-2 rounded text-sm hover:bg-purple-700">
-                        Tukar Sekarang
-                    </a>
-                    {% else %}
-                    <span class="text-gray-500 text-sm">
-                        Butuh {{ reward.points_required|sub:profile.total_points }} points lagi
+        <div class="space-y-4">
+            {% for order in recent_orders %}
+            <div class="border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-semibold text-gray-900">{{ order.order_number }}</h3>
+                    <span class="px-2 py-1 text-xs rounded-full
+                               {% if order.status == 'COMPLETED' %}bg-green-100 text-green-800
+                               {% elif order.status == 'IN_PROGRESS' %}bg-blue-100 text-blue-800
+                               {% elif order.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                               {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ order.get_status_display }}
                     </span>
-                    {% endif %}
                 </div>
-                {% endfor %}
+                <p class="text-gray-600 text-sm">{{ order.service.name }}</p>
+                <p class="text-gray-500 text-xs">{{ order.device_brand }} {{ order.device_model }}</p>
+                <div class="mt-2">
+                    <a href="{% url 'customers:order_detail' order.order_number %}"
+                       class="text-blue-600 hover:text-blue-800 text-sm">
+                        Lihat Detail →
+                    </a>
+                </div>
             </div>
-            {% else %}
-            <div class="text-center py-8">
-                <i class="fas fa-gift text-gray-400 text-4xl mb-4"></i>
-                <p class="text-gray-500">Tidak ada reward yang tersedia</p>
-            </div>
-            {% endif %}
+            {% endfor %}
         </div>
     </div>
+    {% else %}
+    <!-- Empty State for Orders -->
+    <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+        <i class="fas fa-clipboard-list text-gray-400 text-6xl mb-6"></i>
+        <h3 class="text-xl text-gray-600 mb-4">Belum Ada Order</h3>
+        <p class="text-gray-500 mb-6">Mulai dengan membuat order service laptop pertama Anda</p>
+        <a href="{% url 'customers:create_order' %}"
+           class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <i class="fas fa-plus mr-2"></i>
+            Buat Order Pertama
+        </a>
+    </div>
+    {% endif %}
 
-    <!-- Membership Progress -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Progress Membership</h2>
-
-        <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                    <i class="fas fa-star text-white"></i>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">{{ profile.membership_level }} Member</h3>
-                    <p class="text-gray-600 text-sm">{{ profile.total_points }} total points</p>
-                </div>
+    <!-- Membership CTA -->
+    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Program Loyalty</h2>
+        <div class="grid md:grid-cols-3 gap-6 mb-6">
+            <div class="text-center">
+                <i class="fas fa-search text-4xl mb-2 opacity-80"></i>
+                <h3 class="font-semibold mb-2">Real-time Tracking</h3>
+                <p class="text-green-100 text-sm">Pantau progress service laptop Anda</p>
             </div>
-
-            {% if profile.membership_level != 'PLATINUM' %}
-            <div class="text-right">
-                <p class="text-gray-600 text-sm">Next Level:</p>
-                <p class="font-semibold text-gray-900">
-                    {% if profile.membership_level == 'BRONZE' %}SILVER (2,000 pts)
-                    {% elif profile.membership_level == 'SILVER' %}GOLD (5,000 pts)
-                    {% elif profile.membership_level == 'GOLD' %}PLATINUM (10,000 pts)
-                    {% endif %}
-                </p>
+            <div class="text-center">
+                <i class="fas fa-star text-4xl mb-2 opacity-80"></i>
+                <h3 class="font-semibold mb-2">Earn Points</h3>
+                <p class="text-green-100 text-sm">Dapatkan points setiap service</p>
             </div>
-            {% endif %}
+            <div class="text-center">
+                <i class="fas fa-gift text-4xl mb-2 opacity-80"></i>
+                <h3 class="font-semibold mb-2">Exclusive Rewards</h3>
+                <p class="text-green-100 text-sm">Tukar points dengan discount</p>
+            </div>
         </div>
-
-        {% if profile.membership_level != 'PLATINUM' %}
-        <div class="w-full bg-gray-200 rounded-full h-2">
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full"
-                 style="width: {% if profile.membership_level == 'BRONZE' %}{{ profile.total_points|mul:100|div:2000 }}{% elif profile.membership_level == 'SILVER' %}{{ profile.total_points|sub:2000|mul:100|div:3000 }}{% elif profile.membership_level == 'GOLD' %}{{ profile.total_points|sub:5000|mul:100|div:5000 }}{% endif %}%"></div>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'customers:loyalty' %}"
+               class="inline-flex items-center justify-center px-8 py-4 bg-white text-green-600 rounded-lg hover:bg-gray-100 transition-colors text-lg font-medium">
+                <i class="fas fa-star mr-3"></i>
+                Lihat Program Loyalty
+            </a>
         </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
