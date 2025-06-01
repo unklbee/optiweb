@@ -1,0 +1,256 @@
+<!-- ========================================
+templates/customers/order_detail.html
+======================================== -->
+
+{% extends 'customers/base_customer.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block customer_content %}
+<div class="space-y-6">
+    <!-- Order Header -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">{{ order.order_number }}</h1>
+                <p class="text-gray-600 mt-1">Detail order service laptop Anda</p>
+            </div>
+
+            <div class="mt-4 sm:mt-0">
+                <span class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium
+                           {% if order.status == 'COMPLETED' or order.status == 'DELIVERED' %}bg-green-100 text-green-800
+                           {% elif order.status == 'IN_PROGRESS' or order.status == 'TESTING' %}bg-blue-100 text-blue-800
+                           {% elif order.status == 'PENDING' or order.status == 'CONFIRMED' %}bg-yellow-100 text-yellow-800
+                           {% elif order.status == 'CANCELLED' %}bg-red-100 text-red-800
+                           {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    <i class="fas fa-circle mr-2 text-xs"></i>
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mb-6">
+            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Progress Order</span>
+                <span>{{ order.get_progress_percentage }}%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500"
+                     style="width: {{ order.get_progress_percentage }}%"></div>
+            </div>
+        </div>
+
+        <!-- Quick Info -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="text-center">
+                <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-calendar text-blue-600"></i>
+                </div>
+                <div class="text-sm text-gray-600">Tanggal Order</div>
+                <div class="font-semibold">{{ order.created_at|date:"d M Y" }}</div>
+            </div>
+
+            {% if order.estimated_completion %}
+            <div class="text-center">
+                <div class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-clock text-green-600"></i>
+                </div>
+                <div class="text-sm text-gray-600">Estimasi Selesai</div>
+                <div class="font-semibold">{{ order.estimated_completion|date:"d M Y" }}</div>
+            </div>
+            {% endif %}
+
+            {% if order.estimated_cost > 0 %}
+            <div class="text-center">
+                <div class="bg-yellow-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-money-bill text-yellow-600"></i>
+                </div>
+                <div class="text-sm text-gray-600">Estimasi Biaya</div>
+                <div class="font-semibold">Rp {{ order.estimated_cost|floatformat:0 }}</div>
+            </div>
+            {% endif %}
+
+            {% if order.warranty_expiry %}
+            <div class="text-center">
+                <div class="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-shield-alt text-purple-600"></i>
+                </div>
+                <div class="text-sm text-gray-600">Garansi Hingga</div>
+                <div class="font-semibold">{{ order.warranty_expiry|date:"d M Y" }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Order Details -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Service Information -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Informasi Service</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm text-gray-600">Jenis Layanan</label>
+                    <div class="font-medium text-gray-900">{{ order.service.name }}</div>
+                </div>
+
+                <div>
+                    <label class="text-sm text-gray-600">Prioritas</label>
+                    <div class="font-medium text-gray-900">{{ order.get_priority_display }}</div>
+                </div>
+
+                {% if order.assigned_technician %}
+                <div>
+                    <label class="text-sm text-gray-600">Teknisi</label>
+                    <div class="font-medium text-gray-900">{{ order.assigned_technician }}</div>
+                </div>
+                {% endif %}
+
+                <div>
+                    <label class="text-sm text-gray-600">Deskripsi Masalah</label>
+                    <div class="font-medium text-gray-900">{{ order.problem_description }}</div>
+                </div>
+
+                {% if order.customer_notes %}
+                <div>
+                    <label class="text-sm text-gray-600">Catatan untuk Customer</label>
+                    <div class="font-medium text-gray-900 bg-blue-50 p-3 rounded">{{ order.customer_notes }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Device Information -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Informasi Laptop</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm text-gray-600">Brand</label>
+                    <div class="font-medium text-gray-900">{{ order.device_brand }}</div>
+                </div>
+
+                <div>
+                    <label class="text-sm text-gray-600">Model</label>
+                    <div class="font-medium text-gray-900">{{ order.device_model }}</div>
+                </div>
+
+                {% if order.device_serial %}
+                <div>
+                    <label class="text-sm text-gray-600">Serial Number</label>
+                    <div class="font-medium text-gray-900">{{ order.device_serial }}</div>
+                </div>
+                {% endif %}
+
+                <div>
+                    <label class="text-sm text-gray-600">Kondisi Awal</label>
+                    <div class="font-medium text-gray-900">{{ order.device_condition }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Updates/Timeline -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-6">Timeline Service</h2>
+
+        {% if updates %}
+        <div class="space-y-6">
+            {% for update in updates %}
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center
+                               {% if update.status == 'COMPLETED' or update.status == 'DELIVERED' %}bg-green-100
+                               {% elif update.status == 'IN_PROGRESS' or update.status == 'TESTING' %}bg-blue-100
+                               {% elif update.status == 'PENDING' or update.status == 'CONFIRMED' %}bg-yellow-100
+                               {% elif update.status == 'CANCELLED' %}bg-red-100
+                               {% else %}bg-gray-100{% endif %}">
+                        <i class="fas fa-circle text-xs
+                                 {% if update.status == 'COMPLETED' or update.status == 'DELIVERED' %}text-green-600
+                                 {% elif update.status == 'IN_PROGRESS' or update.status == 'TESTING' %}text-blue-600
+                                 {% elif update.status == 'PENDING' or update.status == 'CONFIRMED' %}text-yellow-600
+                                 {% elif update.status == 'CANCELLED' %}text-red-600
+                                 {% else %}text-gray-600{% endif %}"></i>
+                    </div>
+                </div>
+
+                <div class="ml-4 flex-1">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-medium text-gray-900">{{ update.get_status_display }}</h3>
+                        <span class="text-sm text-gray-500">{{ update.created_at|date:"d M Y H:i" }}</span>
+                    </div>
+                    <p class="text-gray-600 mt-1">{{ update.message }}</p>
+                    {% if update.created_by %}
+                    <p class="text-xs text-gray-500 mt-1">oleh {{ update.created_by }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if not forloop.last %}
+            <div class="ml-5 w-px h-6 bg-gray-200"></div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8">
+            <i class="fas fa-clock text-gray-400 text-4xl mb-4"></i>
+            <h3 class="text-lg text-gray-600 mb-2">Menunggu Update</h3>
+            <p class="text-gray-500">Update progress akan muncul di sini</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Tindakan</h2>
+
+        <div class="flex flex-col sm:flex-row gap-4">
+            <a href="{% url 'customers:orders' %}"
+               class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 text-center">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Kembali ke Daftar Order
+            </a>
+
+            {% if business_info %}
+            <a href="https://wa.me/{{ business_info.whatsapp }}?text=Halo, saya ingin menanyakan progress order {{ order.order_number }}"
+               target="_blank"
+               class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 text-center">
+                <i class="fab fa-whatsapp mr-2"></i>
+                Tanya Progress via WhatsApp
+            </a>
+            {% endif %}
+
+            {% if order.status == 'COMPLETED' %}
+            <a href="#"
+               class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 text-center">
+                <i class="fas fa-star mr-2"></i>
+                Berikan Review
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Auto-refresh untuk real-time updates -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto refresh setiap 30 detik jika order masih aktif
+    {% if order.status not in 'COMPLETED,DELIVERED,CANCELLED' %}
+    setInterval(function() {
+        // Check for updates via AJAX
+        fetch(`/customer/ajax/order-status/{{ order.order_number }}/`)
+            .then(response => response.json())
+            .then(data => {
+                // Update progress bar if status changed
+                if (data.progress !== {{ order.get_progress_percentage }}) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.log('Auto-refresh error:', error));
+    }, 30000); // 30 seconds
+    {% endif %}
+});
+</script>
+{% endblock %}

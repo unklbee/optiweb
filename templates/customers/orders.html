@@ -1,0 +1,239 @@
+<!-- ========================================
+templates/customers/orders.html
+======================================== -->
+
+{% extends 'customers/base_customer.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block customer_content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Riwayat Order</h1>
+                <p class="text-gray-600 mt-1">Kelola dan pantau semua order service Anda</p>
+            </div>
+            <div class="mt-4 sm:mt-0">
+                <a href="{% url 'customers:create_order' %}"
+                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-plus mr-2"></i>
+                    Buat Order Baru
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <form method="get" class="space-y-4 sm:space-y-0 sm:flex sm:items-end sm:space-x-4">
+            <!-- Status Filter -->
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">Semua Status</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Search -->
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Cari</label>
+                <input type="text"
+                       name="search"
+                       value="{{ search_query }}"
+                       placeholder="Nomor order, service, atau laptop..."
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+
+            <!-- Submit -->
+            <div>
+                <button type="submit"
+                        class="w-full sm:w-auto px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-search mr-2"></i>
+                    Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Orders List -->
+    {% if page_obj.object_list %}
+    <div class="space-y-4">
+        {% for order in page_obj.object_list %}
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div class="p-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                    <!-- Order Info -->
+                    <div class="flex-1">
+                        <div class="flex items-center mb-2">
+                            <h3 class="text-lg font-semibold text-gray-900 mr-4">
+                                {{ order.order_number }}
+                            </h3>
+                            <span class="px-3 py-1 text-xs rounded-full font-medium
+                                       {% if order.status == 'COMPLETED' or order.status == 'DELIVERED' %}bg-green-100 text-green-800
+                                       {% elif order.status == 'IN_PROGRESS' or order.status == 'TESTING' %}bg-blue-100 text-blue-800
+                                       {% elif order.status == 'PENDING' or order.status == 'CONFIRMED' %}bg-yellow-100 text-yellow-800
+                                       {% elif order.status == 'CANCELLED' %}bg-red-100 text-red-800
+                                       {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                            <div>
+                                <p><strong>Service:</strong> {{ order.service.name }}</p>
+                                <p><strong>Laptop:</strong> {{ order.device_brand }} {{ order.device_model }}</p>
+                            </div>
+                            <div>
+                                <p><strong>Tanggal:</strong> {{ order.created_at|date:"d M Y" }}</p>
+                                {% if order.estimated_completion %}
+                                <p><strong>Estimasi selesai:</strong> {{ order.estimated_completion|date:"d M Y" }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if order.estimated_cost > 0 %}
+                        <div class="mt-3">
+                            <span class="text-lg font-bold text-green-600">
+                                Rp {{ order.estimated_cost|floatformat:0 }}
+                            </span>
+                            {% if order.final_cost > 0 and order.final_cost != order.estimated_cost %}
+                            <span class="text-sm text-gray-500 line-through ml-2">
+                                Rp {{ order.final_cost|floatformat:0 }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Progress & Actions -->
+                    <div class="mt-4 lg:mt-0 lg:ml-6 lg:text-right">
+                        <!-- Progress Bar -->
+                        <div class="mb-3">
+                            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                <span>Progress</span>
+                                <span>{{ order.get_progress_percentage }}%</span>
+                            </div>
+                            <div class="w-32 bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                     style="width: {{ order.get_progress_percentage }}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <a href="{% url 'customers:order_detail' order.order_number %}"
+                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-eye mr-2"></i>
+                            Lihat Detail
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <nav class="flex items-center justify-between">
+            <div class="flex-1 flex justify-between sm:hidden">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Previous
+                </a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Next
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        ({{ page_obj.paginator.count }} total orders)
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+                       class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Previous
+                    </a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <span class="px-3 py-2 border border-blue-500 bg-blue-50 rounded-md text-sm font-medium text-blue-600">
+                            {{ num }}
+                        </span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}{% if current_status %}&status={{ current_status }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+                           class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            {{ num }}
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+                       class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Next
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+        <i class="fas fa-clipboard-list text-gray-400 text-6xl mb-6"></i>
+        <h3 class="text-xl text-gray-600 mb-4">
+            {% if search_query or current_status %}
+                Tidak ada order yang sesuai dengan filter
+            {% else %}
+                Belum Ada Order
+            {% endif %}
+        </h3>
+        <p class="text-gray-500 mb-6">
+            {% if search_query or current_status %}
+                Coba ubah filter pencarian atau hapus filter untuk melihat semua order.
+            {% else %}
+                Mulai dengan membuat order service laptop pertama Anda.
+            {% endif %}
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% if search_query or current_status %}
+            <a href="{% url 'customers:orders' %}"
+               class="inline-flex items-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                <i class="fas fa-times mr-2"></i>
+                Hapus Filter
+            </a>
+            {% endif %}
+
+            <a href="{% url 'customers:create_order' %}"
+               class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i>
+                Buat Order Pertama
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

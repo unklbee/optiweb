@@ -1,0 +1,79 @@
+
+<!-- ========================================
+templates/customers/notifications.html
+======================================== -->
+
+{% extends 'customers/base_customer.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block customer_content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-gray-900">Notifikasi</h1>
+            <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                {{ notifications|length }} notifikasi
+            </span>
+        </div>
+    </div>
+
+    <!-- Notifications List -->
+    {% if notifications %}
+    <div class="bg-white rounded-lg shadow-sm">
+        <div class="divide-y divide-gray-200">
+            {% for notification in notifications %}
+            <div class="p-6 hover:bg-gray-50 transition-colors">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        {% if notification.type == 'order_update' %}
+                        <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fas fa-clipboard-list text-blue-600"></i>
+                        </div>
+                        {% elif notification.type == 'points' %}
+                        <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fas fa-coins text-green-600"></i>
+                        </div>
+                        {% else %}
+                        <div class="bg-gray-100 w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fas fa-bell text-gray-600"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-medium text-gray-900">
+                            {{ notification.title }}
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-1">
+                            {{ notification.message }}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-2">
+                            {{ notification.date|timesince }} yang lalu
+                        </p>
+                    </div>
+                    
+                    {% if notification.order %}
+                    <div class="flex-shrink-0">
+                        <a href="{% url 'customers:order_detail' notification.order.order_number %}"
+                           class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            Lihat Order
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+        <i class="fas fa-bell-slash text-gray-400 text-6xl mb-4"></i>
+        <h3 class="text-xl text-gray-600 mb-2">Belum Ada Notifikasi</h3>
+        <p class="text-gray-500">Notifikasi order dan update akan muncul di sini</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

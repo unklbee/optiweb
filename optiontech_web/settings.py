@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
-from decouple import config
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -48,6 +46,7 @@ INSTALLED_APPS = [
     'ckeditor',  # <- Rich text editor
     'ckeditor_uploader',  # <- File upload untuk editor
     'taggit',  # <- Tags system
+
     # Local apps
     'core',
     'services',
@@ -57,7 +56,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -66,39 +64,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-#Add to AUTH_USER_MODEL (optional, if you want custom user):
-#AUTH_USER_MODEL = 'customers.CustomUser'
-
-#Add email settings for notifications:
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@gmail.com'
-EMAIL_HOST_PASSWORD = 'your-app-password'
-
-# Static files compression
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Cache configuration (untuk production)
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'site_cache',
-    }
-}
-
-# Session optimization
-SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
-SESSION_CACHE_ALIAS = 'default'
-
 ROOT_URLCONF = 'optiontech_web.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,16 +97,6 @@ DATABASES = {
     }
 }
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-
-# Media files (User uploads)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -171,12 +132,35 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# Media files (User uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login/Logout URLs
+LOGIN_URL = '/customer/login/'
+LOGIN_REDIRECT_URL = '/customer/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
+
+# Email Backend Configuration (untuk development)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Cache configuration (simple cache untuk development)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
 
 # CKEditor Configuration
 CKEDITOR_UPLOAD_PATH = "uploads/"
@@ -200,13 +184,5 @@ META_SITE_DOMAIN = 'optiontech.id'
 META_SITE_NAME = 'Service Laptop Bandung Terpercaya'
 META_INCLUDE_KEYWORDS = ['service laptop bandung', 'reparasi laptop bandung']
 
-# Google Analytics
-GOOGLE_ANALYTICS_ID = config('GOOGLE_ANALYTICS_ID', default='')
-GOOGLE_SEARCH_CONSOLE_ID = config('GOOGLE_SEARCH_CONSOLE_ID', default='')
-
-# Meta tags for verification
-GOOGLE_SITE_VERIFICATION = config('GOOGLE_SITE_VERIFICATION', default='')
-BING_SITE_VERIFICATION = config('BING_SITE_VERIFICATION', default='')
-
-# Tambahkan di akhir file
+# Site ID for Django Sites framework
 SITE_ID = 1

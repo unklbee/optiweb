@@ -1,0 +1,199 @@
+<!-- ========================================
+templates/customers/profile.html
+======================================== -->
+
+{% extends 'customers/base_customer.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block customer_content %}
+<div class="space-y-6">
+    <!-- Profile Header -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">Profile Saya</h1>
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg">
+                <span class="text-sm">Member {{ profile.membership_level }}</span>
+            </div>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Display form errors -->
+            {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                <div class="flex">
+                    <i class="fas fa-exclamation-circle text-red-400 mr-2 mt-0.5"></i>
+                    <div>
+                        <h3 class="text-sm font-medium text-red-800">Ada kesalahan dalam form:</h3>
+                        <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ field }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Personal Information -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.first_name.label }}
+                    </label>
+                    {{ form.first_name }}
+                </div>
+                <div>
+                    <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.last_name.label }}
+                    </label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+
+            <div>
+                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.email.label }}
+                </label>
+                {{ form.email }}
+            </div>
+
+            <!-- Contact Information -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.phone.label }}
+                    </label>
+                    {{ form.phone }}
+                </div>
+                <div>
+                    <label for="{{ form.whatsapp.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.whatsapp.label }}
+                    </label>
+                    {{ form.whatsapp }}
+                </div>
+            </div>
+
+            <div>
+                <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.address.label }}
+                </label>
+                {{ form.address }}
+            </div>
+
+            <div>
+                <label for="{{ form.birth_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.birth_date.label }}
+                </label>
+                {{ form.birth_date }}
+            </div>
+
+            <!-- Notification Preferences -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Pengaturan Notifikasi</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        {{ form.email_notifications }}
+                        <label for="{{ form.email_notifications.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                            {{ form.email_notifications.label }}
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.whatsapp_notifications }}
+                        <label for="{{ form.whatsapp_notifications.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                            {{ form.whatsapp_notifications.label }}
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.promotional_offers }}
+                        <label for="{{ form.promotional_offers.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                            {{ form.promotional_offers.label }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end">
+                <button type="submit"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <i class="fas fa-save mr-2"></i>
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Membership Info -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Informasi Membership</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-star text-blue-600 text-xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-900">{{ profile.membership_level }}</h3>
+                <p class="text-gray-600 text-sm">Current Level</p>
+            </div>
+
+            <div class="text-center">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-coins text-green-600 text-xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-900">{{ profile.total_points }}</h3>
+                <p class="text-gray-600 text-sm">Total Points</p>
+            </div>
+
+            <div class="text-center">
+                <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-percentage text-purple-600 text-xl"></i>
+                </div>
+                <h3 class="font-semibold text-gray-900">{{ profile.get_discount_percentage }}%</h3>
+                <p class="text-gray-600 text-sm">Member Discount</p>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center">
+            <a href="{% url 'customers:loyalty' %}"
+               class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                <i class="fas fa-gift mr-2"></i>
+                Lihat Program Loyalty
+            </a>
+        </div>
+    </div>
+
+    <!-- Account Security -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Keamanan Akun</h2>
+
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-medium text-gray-900">Password</h3>
+                    <p class="text-gray-600 text-sm">Terakhir diubah: Tidak diketahui</p>
+                </div>
+                <a href="{% url 'customers:password_reset' %}"
+                   class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    Ubah Password
+                </a>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-medium text-gray-900">Email Verification</h3>
+                    <p class="text-gray-600 text-sm">{{ user.email }}</p>
+                </div>
+                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                    Verified
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

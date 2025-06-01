@@ -1,0 +1,286 @@
+<!-- ========================================
+templates/customers/create_order.html
+======================================== -->
+
+{% extends 'customers/base_customer.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block customer_content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="text-center">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Buat Order Service Baru</h1>
+            <p class="text-gray-600">Isi form di bawah untuk membuat order service laptop</p>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <form method="post" class="space-y-6" id="order-form">
+            {% csrf_token %}
+
+            <!-- Form Errors -->
+            {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                <div class="flex">
+                    <i class="fas fa-exclamation-circle text-red-400 mr-2 mt-0.5"></i>
+                    <div>
+                        <h3 class="text-sm font-medium text-red-800">Ada kesalahan dalam form:</h3>
+                        <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ field }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Service Selection -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <label for="{{ form.service.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.service.label }} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.service }}
+                    <p class="text-gray-500 text-xs mt-1">Pilih jenis layanan yang Anda butuhkan</p>
+                </div>
+
+                <div>
+                    <label for="{{ form.priority.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.priority.label }}
+                    </label>
+                    {{ form.priority }}
+                    <p class="text-gray-500 text-xs mt-1">Pilih prioritas pengerjaan</p>
+                </div>
+            </div>
+
+            <!-- Service Info Display -->
+            <div id="service-info" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 class="font-medium text-blue-900 mb-2">Informasi Layanan</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <span class="text-blue-700">Estimasi Harga:</span>
+                        <div id="service-price" class="font-semibold text-blue-900"></div>
+                    </div>
+                    <div>
+                        <span class="text-blue-700">Estimasi Waktu:</span>
+                        <div id="service-duration" class="font-semibold text-blue-900"></div>
+                    </div>
+                    <div>
+                        <span class="text-blue-700">Kategori:</span>
+                        <div id="service-category" class="font-semibold text-blue-900"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Information -->
+            <div class="border-t border-gray-200 pt-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Informasi Laptop</h2>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.device_brand.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.device_brand.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.device_brand }}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.device_model.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.device_model.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.device_model }}
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <label for="{{ form.device_serial.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.device_serial.label }}
+                    </label>
+                    {{ form.device_serial }}
+                </div>
+            </div>
+
+            <!-- Problem Description -->
+            <div class="border-t border-gray-200 pt-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Deskripsi Masalah</h2>
+
+                <div>
+                    <label for="{{ form.problem_description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.problem_description.label }} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.problem_description }}
+                    <p class="text-gray-500 text-xs mt-1">
+                        Jelaskan masalah laptop Anda secara detail. Semakin detail, semakin akurat estimasi yang kami berikan.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Customer Info Summary -->
+            <div class="border-t border-gray-200 pt-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Informasi Kontak</h2>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="text-gray-600">Nama:</span>
+                            <div class="font-medium">{{ user.get_full_name|default:user.username }}</div>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Email:</span>
+                            <div class="font-medium">{{ user.email }}</div>
+                        </div>
+                        {% if user.customerprofile.phone %}
+                        <div>
+                            <span class="text-gray-600">Telepon:</span>
+                            <div class="font-medium">{{ user.customerprofile.phone }}</div>
+                        </div>
+                        {% endif %}
+                        {% if user.customerprofile.whatsapp %}
+                        <div>
+                            <span class="text-gray-600">WhatsApp:</span>
+                            <div class="font-medium">{{ user.customerprofile.whatsapp }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-gray-200">
+                        <a href="{% url 'customers:profile' %}" class="text-blue-600 hover:text-blue-800 text-sm">
+                            <i class="fas fa-edit mr-1"></i>
+                            Update informasi kontak
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terms & Conditions -->
+            <div class="border-t border-gray-200 pt-6">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h3 class="font-medium text-yellow-800 mb-2">Ketentuan Service</h3>
+                    <ul class="text-yellow-700 text-sm space-y-1">
+                        <li>• Estimasi harga dan waktu dapat berubah setelah diagnosa detail</li>
+                        <li>• Backup data Anda sebelum service, kami tidak bertanggung jawab atas kehilangan data</li>
+                        <li>• Pembayaran dilakukan setelah service selesai dan laptop diambil</li>
+                        <li>• Garansi service berlaku sesuai jenis layanan yang dipilih</li>
+                        <li>• Order yang tidak diambil dalam 30 hari akan dikenakan biaya storage</li>
+                    </ul>
+                </div>
+
+                <div class="mt-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" required class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <span class="text-sm text-gray-700">
+                            Saya menyetujui <a href="#" class="text-blue-600 hover:text-blue-800">syarat dan ketentuan</a> yang berlaku
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                <button type="submit"
+                        class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Submit Order
+                </button>
+
+                <a href="{% url 'customers:orders' %}"
+                   class="flex-1 bg-gray-300 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-400 text-center font-medium">
+                    <i class="fas fa-times mr-2"></i>
+                    Batal
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Help Section -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Butuh Bantuan?</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="font-medium text-gray-900 mb-2">Konsultasi Gratis</h3>
+                <p class="text-gray-600 text-sm mb-3">
+                    Tidak yakin dengan masalah laptop Anda? Konsultasi gratis dengan teknisi kami.
+                </p>
+                <div class="flex space-x-3">
+                    {% if business_info %}
+                    <a href="https://wa.me/{{ business_info.whatsapp }}"
+                       target="_blank"
+                       class="text-green-600 hover:text-green-700 text-sm font-medium">
+                        <i class="fab fa-whatsapp mr-1"></i>
+                        WhatsApp
+                    </a>
+                    <a href="tel:{{ business_info.phone }}"
+                       class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        <i class="fas fa-phone mr-1"></i>
+                        Telepon
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-medium text-gray-900 mb-2">Service Pickup & Delivery</h3>
+                <p class="text-gray-600 text-sm mb-3">
+                    Tidak bisa datang ke tempat? Kami menyediakan layanan pickup dan delivery.
+                </p>
+                <a href="{% url 'content:contact' %}"
+                   class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Info Selengkapnya
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const serviceSelect = document.getElementById('{{ form.service.id_for_label }}');
+    const serviceInfo = document.getElementById('service-info');
+    const servicePrice = document.getElementById('service-price');
+    const serviceDuration = document.getElementById('service-duration');
+    const serviceCategory = document.getElementById('service-category');
+
+    if (serviceSelect) {
+        serviceSelect.addEventListener('change', function() {
+            const serviceId = this.value;
+
+            if (serviceId) {
+                // Show loading
+                serviceInfo.classList.remove('hidden');
+                servicePrice.textContent = 'Loading...';
+                serviceDuration.textContent = 'Loading...';
+                serviceCategory.textContent = 'Loading...';
+
+                // Fetch service details
+                fetch(`/customer/ajax/service-price/${serviceId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.price_range) {
+                            servicePrice.textContent = data.price_range;
+                            serviceDuration.textContent = data.duration;
+                            serviceCategory.textContent = 'Service Laptop';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        servicePrice.textContent = 'Error loading price';
+                        serviceDuration.textContent = 'Error loading duration';
+                        serviceCategory.textContent = 'Error loading category';
+                    });
+            } else {
+                serviceInfo.classList.add('hidden');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
