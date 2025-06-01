@@ -1,29 +1,55 @@
-<!-- ========================================
-templates/customers/dashboard.html
-======================================== -->
-
+<!-- templates/customers/dashboard.html -->
 {% extends 'customers/base_customer.html' %}
 {% load static %}
+{% load math_filters %}
 
 {% block title %}{{ page_title }}{% endblock %}
+{% block mobile_title %}Dashboard{% endblock %}
 
 {% block customer_content %}
-<div class="space-y-6">
+<div class="space-y-8">
     <!-- Welcome Header -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                    Selamat datang, {{ user.get_full_name|default:user.username }}!
-                </h1>
-                <p class="text-gray-600 mt-1">Kelola order dan tracking service laptop Anda</p>
-            </div>
-            <div class="hidden md:block">
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-lg">
+    <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 rounded-2xl p-8 text-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute top-0 right-0 opacity-10">
+            <i class="fas fa-laptop text-9xl"></i>
+        </div>
+
+        <div class="relative z-10">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div class="mb-6 lg:mb-0">
+                    <h1 class="text-3xl lg:text-4xl font-bold mb-2">
+                        Selamat datang, {{ user.get_full_name|default:user.username }}! 👋
+                    </h1>
+                    <p class="text-blue-100 text-lg">
+                        Kelola order dan tracking service laptop Anda dengan mudah
+                    </p>
+                </div>
+
+                <!-- Member Card -->
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 min-w-max">
                     <div class="text-center">
-                        <p class="text-blue-100 text-sm">Member Status</p>
-                        <p class="text-xl font-bold">{{ profile.membership_level|default:"BRONZE" }}</p>
-                        <p class="text-blue-100 text-sm">{{ profile.total_points|default:0 }} Points</p>
+                        <div class="flex items-center justify-center mb-2">
+                            <i class="fas fa-crown text-yellow-400 mr-2"></i>
+                            <span class="font-bold text-lg">{{ profile.membership_level }}</span>
+                        </div>
+                        <div class="text-2xl font-bold mb-1">{{ profile.total_points }}</div>
+                        <div class="text-blue-200 text-sm">Total Points</div>
+
+                        <!-- Progress to Next Level -->
+                        {% if profile.membership_level != 'PLATINUM' %}
+                        <div class="mt-3 pt-3 border-t border-white/20">
+                            <div class="text-xs text-blue-200 mb-1">
+                                Progress ke {{ profile.membership_level|next_level_name }}
+                            </div>
+                            <div class="w-full bg-white/20 rounded-full h-2">
+                                {% with progress_percent=profile.total_points|membership_progress:profile.membership_level %}
+                                <div class="bg-yellow-400 h-2 rounded-full transition-all duration-500"
+                                     style="width: {{ progress_percent|floatformat:1 }}%"></div>
+                                {% endwith %}
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -32,170 +58,445 @@ templates/customers/dashboard.html
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <!-- Total Orders -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <div class="flex items-center">
-                <div class="bg-blue-100 rounded-lg p-3">
-                    <i class="fas fa-list text-blue-600 text-xl"></i>
+                <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mr-4">
+                    <i class="fas fa-clipboard-list text-blue-600 text-xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-sm font-medium text-gray-500">Total Order</h3>
-                    <p class="text-2xl font-bold text-gray-900">{{ total_orders|default:0 }}</p>
+                <div class="flex-1">
+                    <h3 class="text-sm font-medium text-gray-600">Total Order</h3>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_orders }}</p>
+                    <p class="text-sm text-gray-500">Sepanjang masa</p>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <!-- Active Orders -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <div class="flex items-center">
-                <div class="bg-yellow-100 rounded-lg p-3">
+                <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center mr-4">
                     <i class="fas fa-clock text-yellow-600 text-xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-sm font-medium text-gray-500">Order Aktif</h3>
-                    <p class="text-2xl font-bold text-gray-900">{{ active_orders|default:0 }}</p>
+                <div class="flex-1">
+                    <h3 class="text-sm font-medium text-gray-600">Order Aktif</h3>
+                    <p class="text-3xl font-bold text-gray-900">{{ active_orders }}</p>
+                    <p class="text-sm text-gray-500">Sedang diproses</p>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <!-- Completed Orders -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <div class="flex items-center">
-                <div class="bg-green-100 rounded-lg p-3">
+                <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mr-4">
                     <i class="fas fa-check-circle text-green-600 text-xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-sm font-medium text-gray-500">Selesai</h3>
-                    <p class="text-2xl font-bold text-gray-900">{{ completed_orders|default:0 }}</p>
+                <div class="flex-1">
+                    <h3 class="text-sm font-medium text-gray-600">Selesai</h3>
+                    <p class="text-3xl font-bold text-gray-900">{{ completed_orders }}</p>
+                    <p class="text-sm text-gray-500">Berhasil diselesaikan</p>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <!-- Points -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <div class="flex items-center">
-                <div class="bg-purple-100 rounded-lg p-3">
+                <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center mr-4">
                     <i class="fas fa-star text-purple-600 text-xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-sm font-medium text-gray-500">Points</h3>
-                    <p class="text-2xl font-bold text-gray-900">{{ profile.total_points|default:0 }}</p>
+                <div class="flex-1">
+                    <h3 class="text-sm font-medium text-gray-600">Points</h3>
+                    <p class="text-3xl font-bold text-gray-900">{{ profile.total_points }}</p>
+                    <p class="text-sm text-purple-600 font-medium">{{ profile.get_discount_percentage }}% discount</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Create New Order -->
             <a href="{% url 'customers:create_order' %}"
-               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors">
-                <div class="bg-blue-100 rounded-lg p-3 mr-4">
-                    <i class="fas fa-plus-circle text-blue-600 text-xl"></i>
+               class="group bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-2 border-blue-200 hover:border-blue-300 rounded-2xl p-6 transition-all duration-300 transform hover:scale-105">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-plus-circle text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Buat Order Baru</h3>
+                        <p class="text-gray-600 text-sm">Service laptop Anda</p>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">Buat Order Baru</h3>
-                    <p class="text-gray-600 text-sm">Service laptop Anda</p>
+                <div class="flex items-center text-blue-600 font-medium group-hover:text-blue-700">
+                    <span>Mulai sekarang</span>
+                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </a>
 
+            <!-- Track Orders -->
             <a href="{% url 'customers:orders' %}"
-               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors">
-                <div class="bg-green-100 rounded-lg p-3 mr-4">
-                    <i class="fas fa-search text-green-600 text-xl"></i>
+               class="group bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 border-2 border-green-200 hover:border-green-300 rounded-2xl p-6 transition-all duration-300 transform hover:scale-105">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-search text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Tracking Order</h3>
+                        <p class="text-gray-600 text-sm">Cek status service</p>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">Tracking Order</h3>
-                    <p class="text-gray-600 text-sm">Cek status service</p>
+                <div class="flex items-center text-green-600 font-medium group-hover:text-green-700">
+                    <span>Lihat semua order</span>
+                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </a>
 
+            <!-- Loyalty Points -->
             <a href="{% url 'customers:loyalty' %}"
-               class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors">
-                <div class="bg-purple-100 rounded-lg p-3 mr-4">
-                    <i class="fas fa-gift text-purple-600 text-xl"></i>
+               class="group bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 border-2 border-purple-200 hover:border-purple-300 rounded-2xl p-6 transition-all duration-300 transform hover:scale-105">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-gift text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Tukar Points</h3>
+                        <p class="text-gray-600 text-sm">Dapatkan reward</p>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">Tukar Points</h3>
-                    <p class="text-gray-600 text-sm">Dapatkan reward</p>
+                <div class="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
+                    <span>{{ profile.total_points }} points tersedia</span>
+                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </a>
         </div>
     </div>
 
-    <!-- Recent Orders (if any) -->
-    {% if recent_orders %}
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">Order Terbaru</h2>
-            <a href="{% url 'customers:orders' %}" class="text-blue-600 hover:text-blue-800 text-sm">
-                Lihat Semua
-            </a>
-        </div>
-
-        <div class="space-y-4">
-            {% for order in recent_orders %}
-            <div class="border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="font-semibold text-gray-900">{{ order.order_number }}</h3>
-                    <span class="px-2 py-1 text-xs rounded-full
-                               {% if order.status == 'COMPLETED' %}bg-green-100 text-green-800
-                               {% elif order.status == 'IN_PROGRESS' %}bg-blue-100 text-blue-800
-                               {% elif order.status == 'PENDING' %}bg-yellow-100 text-yellow-800
-                               {% else %}bg-gray-100 text-gray-800{% endif %}">
-                        {{ order.get_status_display }}
-                    </span>
-                </div>
-                <p class="text-gray-600 text-sm">{{ order.service.name }}</p>
-                <p class="text-gray-500 text-xs">{{ order.device_brand }} {{ order.device_model }}</p>
-                <div class="mt-2">
-                    <a href="{% url 'customers:order_detail' order.order_number %}"
-                       class="text-blue-600 hover:text-blue-800 text-sm">
-                        Lihat Detail →
+    <!-- Recent Orders & Available Rewards -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Orders -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">Order Terbaru</h2>
+                    <a href="{% url 'customers:orders' %}"
+                       class="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center">
+                        Lihat Semua
+                        <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% else %}
-    <!-- Empty State for Orders -->
-    <div class="bg-white rounded-lg shadow-sm p-12 text-center">
-        <i class="fas fa-clipboard-list text-gray-400 text-6xl mb-6"></i>
-        <h3 class="text-xl text-gray-600 mb-4">Belum Ada Order</h3>
-        <p class="text-gray-500 mb-6">Mulai dengan membuat order service laptop pertama Anda</p>
-        <a href="{% url 'customers:create_order' %}"
-           class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            <i class="fas fa-plus mr-2"></i>
-            Buat Order Pertama
-        </a>
-    </div>
-    {% endif %}
 
-    <!-- Membership CTA -->
-    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-8 text-center">
-        <h2 class="text-3xl font-bold mb-4">Program Loyalty</h2>
-        <div class="grid md:grid-cols-3 gap-6 mb-6">
-            <div class="text-center">
-                <i class="fas fa-search text-4xl mb-2 opacity-80"></i>
-                <h3 class="font-semibold mb-2">Real-time Tracking</h3>
-                <p class="text-green-100 text-sm">Pantau progress service laptop Anda</p>
-            </div>
-            <div class="text-center">
-                <i class="fas fa-star text-4xl mb-2 opacity-80"></i>
-                <h3 class="font-semibold mb-2">Earn Points</h3>
-                <p class="text-green-100 text-sm">Dapatkan points setiap service</p>
-            </div>
-            <div class="text-center">
-                <i class="fas fa-gift text-4xl mb-2 opacity-80"></i>
-                <h3 class="font-semibold mb-2">Exclusive Rewards</h3>
-                <p class="text-green-100 text-sm">Tukar points dengan discount</p>
+            <div class="p-6">
+                {% if recent_orders %}
+                <div class="space-y-4">
+                    {% for order in recent_orders %}
+                    <div class="border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:bg-blue-50/50 transition-all duration-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <h3 class="font-bold text-gray-900 mr-3">{{ order.order_number }}</h3>
+                                <span class="px-3 py-1 text-xs rounded-full font-medium
+                                           {% if order.status == 'COMPLETED' or order.status == 'DELIVERED' %}bg-green-100 text-green-800
+                                           {% elif order.status == 'IN_PROGRESS' or order.status == 'TESTING' %}bg-blue-100 text-blue-800
+                                           {% elif order.status == 'PENDING' or order.status == 'CONFIRMED' %}bg-yellow-100 text-yellow-800
+                                           {% elif order.status == 'CANCELLED' %}bg-red-100 text-red-800
+                                           {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-500">{{ order.created_at|date:"d M Y" }}</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="text-gray-700 font-medium">{{ order.service.name }}</p>
+                            <p class="text-gray-500 text-sm">{{ order.device_brand }} {{ order.device_model }}</p>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="mb-3">
+                            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                <span>Progress</span>
+                                <span>{{ order.get_progress_percentage }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="{{ order.get_progress_percentage|progress_color }} h-2 rounded-full transition-all duration-300"
+                                     style="width: {{ order.get_progress_percentage }}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            {% if order.estimated_cost > 0 %}
+                            <span class="text-green-600 font-bold">
+                                {{ order.estimated_cost|format_currency }}
+                            </span>
+                            {% else %}
+                            <span class="text-gray-500 text-sm">Estimasi segera</span>
+                            {% endif %}
+
+                            <a href="{% url 'customers:order_detail' order.order_number %}"
+                               class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center">
+                                Detail
+                                <i class="fas fa-chevron-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-clipboard-list text-gray-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg text-gray-600 mb-2">Belum Ada Order</h3>
+                    <p class="text-gray-500 text-sm mb-4">Mulai dengan membuat order service laptop pertama Anda</p>
+                    <a href="{% url 'customers:create_order' %}"
+                       class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Buat Order Pertama
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{% url 'customers:loyalty' %}"
-               class="inline-flex items-center justify-center px-8 py-4 bg-white text-green-600 rounded-lg hover:bg-gray-100 transition-colors text-lg font-medium">
-                <i class="fas fa-star mr-3"></i>
-                Lihat Program Loyalty
-            </a>
+
+        <!-- Available Rewards -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">Reward Tersedia</h2>
+                    <a href="{% url 'customers:loyalty' %}"
+                       class="text-purple-600 hover:text-purple-700 font-medium text-sm flex items-center">
+                        Lihat Semua
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="p-6">
+                {% if available_rewards %}
+                <div class="space-y-4">
+                    {% for reward in available_rewards %}
+                    <div class="border border-gray-200 rounded-xl p-4 hover:border-purple-300 hover:bg-purple-50/50 transition-all duration-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-gray-900">{{ reward.name }}</h3>
+                            <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold">
+                                {{ reward.points_required }} pts
+                            </span>
+                        </div>
+
+                        <p class="text-gray-600 text-sm mb-3">{{ reward.description|truncatewords:15 }}</p>
+
+                        <div class="flex items-center justify-between">
+                            {% if reward.points_required <= profile.total_points %}
+                            <span class="text-green-600 text-sm font-medium">
+                                <i class="fas fa-check-circle mr-1"></i>
+                                Dapat ditukar
+                            </span>
+                            <a href="{% url 'customers:redeem_reward' reward.id %}"
+                               class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">
+                                Tukar Sekarang
+                            </a>
+                            {% else %}
+                            {% with needed_points=reward.points_required|subtract:profile.total_points %}
+                            <span class="text-gray-500 text-sm">
+                                Butuh {{ needed_points }} pts lagi
+                            </span>
+                            {% endwith %}
+                            <button class="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed">
+                                Belum Bisa
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-gift text-gray-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg text-gray-600 mb-2">Belum Ada Reward</h3>
+                    <p class="text-gray-500 text-sm">Reward akan tersedia setelah Anda mengumpulkan lebih banyak points</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Membership Progress -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Progress Membership</h2>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Current Status -->
+            <div>
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                        <i class="fas fa-crown text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">{{ profile.membership_level }} Member</h3>
+                        <p class="text-gray-600">{{ profile.total_points }} total points</p>
+                        <p class="text-purple-600 font-medium">{{ profile.get_discount_percentage }}% discount untuk semua service</p>
+                    </div>
+                </div>
+
+                <!-- Benefits -->
+                <div class="space-y-3">
+                    <h4 class="font-semibold text-gray-900">Keuntungan Member {{ profile.membership_level }}:</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Discount {{ profile.get_discount_percentage }}% untuk semua service</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Points reward setiap service</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Priority customer support</span>
+                        </div>
+                        {% if profile.membership_level == 'GOLD' or profile.membership_level == 'PLATINUM' %}
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Free pickup & delivery</span>
+                        </div>
+                        {% endif %}
+                        {% if profile.membership_level == 'PLATINUM' %}
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Express service priority</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Level Progress -->
+            <div>
+                {% if profile.membership_level != 'PLATINUM' %}
+                <div class="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-6">
+                    <h4 class="font-semibold text-gray-900 mb-4">Progress ke Level Berikutnya</h4>
+
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">
+                            {{ profile.membership_level }} → {{ profile.membership_level|next_level_name }}
+                        </span>
+                        <span class="text-sm font-medium text-gray-900">
+                            {% if profile.membership_level == 'BRONZE' %}{{ profile.total_points }}/2,000 pts
+                            {% elif profile.membership_level == 'SILVER' %}{{ profile.total_points }}/5,000 pts
+                            {% elif profile.membership_level == 'GOLD' %}{{ profile.total_points }}/10,000 pts
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                        {% with progress_percent=profile.total_points|membership_progress:profile.membership_level %}
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                             style="width: {{ progress_percent|floatformat:1 }}%"></div>
+                        {% endwith %}
+                    </div>
+
+                    <div class="text-center">
+                        {% with needed_points=profile.total_points|points_needed:profile.membership_level %}
+                        {% if needed_points > 0 %}
+                        <p class="text-sm text-gray-600 mb-3">
+                            Butuh <span class="font-bold text-blue-600">{{ needed_points }} points</span> lagi untuk menjadi {{ profile.membership_level|next_level_name }} Member
+                        </p>
+                        {% endif %}
+                        {% endwith %}
+
+                        <a href="{% url 'customers:create_order' %}"
+                           class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                            <i class="fas fa-plus mr-2"></i>
+                            Service untuk Dapat Points
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Platinum Member -->
+                <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 border-2 border-yellow-200">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-crown text-white text-2xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2">Selamat! 🎉</h4>
+                        <p class="text-gray-600 mb-4">Anda telah mencapai level tertinggi sebagai Platinum Member</p>
+                        <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-3">
+                            <p class="text-yellow-800 text-sm font-medium">
+                                Nikmati semua benefit eksklusif dan tetap kumpulkan points untuk reward menarik!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Help & Support -->
+    <div class="bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl p-8 text-white">
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+                <h2 class="text-2xl font-bold mb-4">Butuh Bantuan?</h2>
+                <p class="text-blue-100 mb-6 text-lg">
+                    Tim customer service kami siap membantu Anda 24/7.
+                    Jangan ragu untuk menghubungi kami jika ada pertanyaan.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    {% if business_info %}
+                    <a href="https://wa.me/{{ business_info.whatsapp }}"
+                       target="_blank"
+                       class="inline-flex items-center justify-center bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition-colors">
+                        <i class="fab fa-whatsapp mr-2"></i>
+                        Chat WhatsApp
+                    </a>
+                    <a href="tel:{{ business_info.phone }}"
+                       class="inline-flex items-center justify-center bg-white/20 hover:bg-white/30 text-white border border-white/30 px-6 py-3 rounded-xl font-medium transition-colors">
+                        <i class="fas fa-phone mr-2"></i>
+                        Telepon
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="text-center md:text-right">
+                <div class="inline-flex items-center justify-center w-32 h-32 bg-white/10 rounded-full">
+                    <i class="fas fa-headset text-6xl"></i>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh for real-time updates (optional)
+    setInterval(function() {
+        // You can add AJAX calls here to update order statuses
+        // without full page reload
+    }, 60000); // Every minute
+
+    // Smooth scroll for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

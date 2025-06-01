@@ -1,129 +1,346 @@
-<!-- ========================================
-templates/customers/base_customer.html
-======================================== -->
-
+<!-- templates/customers/base_customer.html -->
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_js %}
+<style>
+    .sidebar-nav {
+        min-height: calc(100vh - 120px);
+    }
+
+    .nav-item {
+        position: relative;
+        margin-bottom: 4px;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        color: #64748b;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .nav-link:hover {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        transform: translateX(4px);
+    }
+
+    .nav-link.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .nav-link.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #fbbf24;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .nav-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mobile-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .mobile-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .user-profile-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 20px;
+        color: white;
+        margin-bottom: 24px;
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #ef4444;
+        color: white;
+        border-radius: 50%;
+        width: 8px;
+        height: 8px;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .main-content {
+        background: #f8fafc;
+        min-height: calc(100vh - 120px);
+    }
+
+    @media (max-width: 1024px) {
+        .desktop-sidebar {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <div class="min-h-screen bg-gray-50">
-        <!-- Customer Navigation Sidebar -->
-        <div class="flex">
-            <!-- Sidebar for desktop -->
-            <div class="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:pt-20">
-                <div class="flex-1 flex flex-col min-h-0 bg-white shadow-lg">
-                    <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-                        <!-- User Profile Card -->
-                        <div class="px-4 mb-6">
-                            <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
-                                <div class="flex items-center">
-                                    <div class="bg-white bg-opacity-20 rounded-full p-2 mr-3">
-                                        <i class="fas fa-user text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-semibold">{{ user.get_full_name|default:user.username }}</h3>
-                                        {% if user.customerprofile %}
-                                            <p class="text-blue-100 text-sm">{{ user.customerprofile.membership_level }}
-                                                Member</p>
-                                            <p class="text-blue-100 text-sm">{{ user.customerprofile.total_points }}
-                                                Points</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
+<div class="min-h-screen bg-gray-50">
+    <!-- Desktop Sidebar -->
+    <div class="desktop-sidebar hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col lg:pt-20 z-30">
+        <div class="flex flex-col flex-1 bg-white shadow-xl border-r border-gray-200">
+            <!-- User Profile Card -->
+            <div class="p-6">
+                <div class="user-profile-card">
+                    <div class="flex items-center">
+                        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-2xl"></i>
                         </div>
-
-                        <!-- Navigation Menu -->
-                        <nav class="flex-1 px-4 space-y-2">
-                            <a href="{% url 'customers:dashboard' %}"
-                               class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                                <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
-                            </a>
-                            <a href="{% url 'customers:orders' %}"
-                               class="nav-link {% if 'orders' in request.resolver_match.url_name %}active{% endif %}">
-                                <i class="fas fa-list mr-3"></i>Order Saya
-                            </a>
-                            <a href="{% url 'customers:create_order' %}"
-                               class="nav-link {% if request.resolver_match.url_name == 'create_order' %}active{% endif %}">
-                                <i class="fas fa-plus-circle mr-3"></i>Buat Order Baru
-                            </a>
-                            <a href="{% url 'customers:loyalty' %}"
-                               class="nav-link {% if request.resolver_match.url_name == 'loyalty' %}active{% endif %}">
-                                <i class="fas fa-star mr-3"></i>Program Loyalty
-                            </a>
-                            <a href="{% url 'customers:profile' %}"
-                               class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-                                <i class="fas fa-user-edit mr-3"></i>Profile Saya
-                            </a>
-                            <a href="{% url 'customers:notifications' %}"
-                               class="nav-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
-                                <i class="fas fa-bell mr-3"></i>Notifikasi
-                            </a>
-
-                            <hr class="my-4">
-
-                            <a href="{% url 'home' %}" class="nav-link">
-                                <i class="fas fa-home mr-3"></i>Kembali ke Website
-                            </a>
-                            <a href="{% url 'customers:logout' %}" class="nav-link text-red-600 hover:bg-red-50">
-                                <i class="fas fa-sign-out-alt mr-3"></i>Logout
-                            </a>
-                        </nav>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-lg truncate">{{ user.get_full_name|default:user.username }}</h3>
+                            {% if user.customerprofile %}
+                            <div class="flex items-center mt-1">
+                                <span class="bg-white/20 px-2 py-1 rounded-full text-xs font-medium">
+                                    {{ user.customerprofile.membership_level }}
+                                </span>
+                                <span class="ml-2 text-sm opacity-90">
+                                    {{ user.customerprofile.total_points }} pts
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Main content -->
-            <div class="lg:pl-64 flex flex-col flex-1">
-                <!-- Mobile menu button -->
-                <div class="lg:hidden bg-white shadow-sm border-b border-gray-200 px-4 py-3">
-                    <button id="mobile-sidebar-toggle" class="text-gray-600 hover:text-gray-900">
-                        <i class="fas fa-bars text-xl"></i>
-                    </button>
-                </div>
+            <!-- Navigation Menu -->
+            <nav class="flex-1 px-6 pb-6 sidebar-nav">
+                <div class="space-y-1">
+                    <!-- Dashboard -->
+                    <div class="nav-item">
+                        <a href="{% url 'customers:dashboard' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            <div class="nav-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <span>Dashboard</span>
+                        </a>
+                    </div>
 
-                <!-- Page content -->
-                <main class="flex-1 p-4 lg:p-8">
-                    {% block customer_content %}
-                    {% endblock %}
-                </main>
+                    <!-- Orders Section -->
+                    <div class="mt-6 mb-2">
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4">
+                            Service Orders
+                        </h3>
+                    </div>
+
+                    <div class="nav-item">
+                        <a href="{% url 'customers:create_order' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'create_order' %}active{% endif %}">
+                            <div class="nav-icon">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <span>Buat Order Baru</span>
+                        </a>
+                    </div>
+
+                    <div class="nav-item">
+                        <a href="{% url 'customers:orders' %}"
+                           class="nav-link {% if 'orders' in request.resolver_match.url_name and request.resolver_match.url_name != 'create_order' %}active{% endif %}">
+                            <div class="nav-icon">
+                                <i class="fas fa-list-alt"></i>
+                            </div>
+                            <span>Order Saya</span>
+                            {% if user.customerprofile %}
+                                {% with active_orders=user.customerprofile.orders.all|length %}
+                                    {% if active_orders > 0 %}
+                                    <span class="ml-auto bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                        {{ active_orders }}
+                                    </span>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        </a>
+                    </div>
+
+                    <!-- Loyalty Section -->
+                    <div class="mt-6 mb-2">
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4">
+                            Rewards & Loyalty
+                        </h3>
+                    </div>
+
+                    <div class="nav-item">
+                        <a href="{% url 'customers:loyalty' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'loyalty' or 'reward' in request.resolver_match.url_name %}active{% endif %}">
+                            <div class="nav-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span>Program Loyalty</span>
+                            {% if user.customerprofile and user.customerprofile.total_points > 0 %}
+                            <span class="ml-auto bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                                {{ user.customerprofile.total_points }}
+                            </span>
+                            {% endif %}
+                        </a>
+                    </div>
+
+                    <!-- Account Section -->
+                    <div class="mt-6 mb-2">
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4">
+                            Account Settings
+                        </h3>
+                    </div>
+
+                    <div class="nav-item">
+                        <a href="{% url 'customers:profile' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                            <div class="nav-icon">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <span>Profile Saya</span>
+                        </a>
+                    </div>
+
+                    <div class="nav-item">
+                        <a href="{% url 'customers:notifications' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+                            <div class="nav-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <span>Notifikasi</span>
+                            <div class="notification-badge"></div>
+                        </a>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="mt-6 mb-2">
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4">
+                            Quick Links
+                        </h3>
+                    </div>
+
+                    <div class="nav-item">
+                        <a href="{% url 'home' %}" class="nav-link">
+                            <div class="nav-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <span>Website Utama</span>
+                        </a>
+                    </div>
+
+                    <div class="nav-item">
+                        <a href="{% url 'content:faq' %}" class="nav-link">
+                            <div class="nav-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <span>FAQ & Bantuan</span>
+                        </a>
+                    </div>
+
+                    <!-- Logout -->
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <div class="nav-item">
+                            <a href="{% url 'customers:logout' %}"
+                               class="nav-link text-red-600 hover:bg-red-50 hover:text-red-700">
+                                <div class="nav-icon">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Mobile Header -->
+    <div class="lg:hidden bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
+        <div class="flex items-center justify-between px-4 py-3">
+            <!-- Mobile Menu Button -->
+            <button id="mobile-sidebar-toggle"
+                    class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg p-2">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+
+            <!-- Mobile Title -->
+            <h1 class="text-lg font-semibold text-gray-900">
+                {% block mobile_title %}Customer Dashboard{% endblock %}
+            </h1>
+
+            <!-- Mobile User Menu -->
+            <div class="flex items-center space-x-2">
+                {% if user.customerprofile %}
+                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                    {{ user.customerprofile.total_points }} pts
+                </span>
+                {% endif %}
+                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span class="text-white text-sm font-bold">
+                        {{ user.first_name|first|default:user.username|first|upper }}
+                    </span>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Mobile Sidebar Overlay -->
-        <div id="mobile-sidebar-overlay" class="lg:hidden fixed inset-0 z-50 hidden">
-            <div class="fixed inset-0 bg-black bg-opacity-50" id="mobile-sidebar-backdrop"></div>
-            <div class="fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-xl">
-                <!-- Mobile sidebar content (same as desktop) -->
-                <div class="flex flex-col h-full">
-                    <div class="px-4 py-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                        <button id="mobile-sidebar-close" class="float-right text-white">
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobile-sidebar-overlay" class="lg:hidden fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-50" id="mobile-sidebar-backdrop"></div>
+        <div class="mobile-sidebar fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-xl">
+            <div class="flex flex-col h-full">
+                <!-- Mobile Header -->
+                <div class="p-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold">Menu</h2>
+                        <button id="mobile-sidebar-close" class="text-white hover:text-gray-200">
                             <i class="fas fa-times text-xl"></i>
                         </button>
-                        <div class="flex items-center mt-4">
-                            <div class="bg-white bg-opacity-20 rounded-full p-2 mr-3">
-                                <i class="fas fa-user text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold">{{ user.get_full_name|default:user.username }}</h3>
-                                {% if user.customerprofile %}
-                                    <p class="text-blue-100 text-sm">{{ user.customerprofile.membership_level }}
-                                        Member</p>
-                                {% endif %}
-                            </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">{{ user.get_full_name|default:user.username }}</h3>
+                            {% if user.customerprofile %}
+                            <p class="text-blue-100 text-sm">{{ user.customerprofile.membership_level }} Member</p>
+                            {% endif %}
                         </div>
                     </div>
+                </div>
 
-                    <nav class="flex-1 px-4 py-6 space-y-2">
-                        <!-- Same navigation links as desktop -->
+                <!-- Mobile Navigation -->
+                <nav class="flex-1 px-4 py-6 overflow-y-auto">
+                    <div class="space-y-1">
                         <a href="{% url 'customers:dashboard' %}" class="mobile-nav-link">
-                            <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
-                        </a>
-                        <a href="{% url 'customers:orders' %}" class="mobile-nav-link">
-                            <i class="fas fa-list mr-3"></i>Order Saya
+                            <i class="fas fa-home mr-3"></i>Dashboard
                         </a>
                         <a href="{% url 'customers:create_order' %}" class="mobile-nav-link">
                             <i class="fas fa-plus-circle mr-3"></i>Buat Order Baru
+                        </a>
+                        <a href="{% url 'customers:orders' %}" class="mobile-nav-link">
+                            <i class="fas fa-list-alt mr-3"></i>Order Saya
                         </a>
                         <a href="{% url 'customers:loyalty' %}" class="mobile-nav-link">
                             <i class="fas fa-star mr-3"></i>Program Loyalty
@@ -131,116 +348,95 @@ templates/customers/base_customer.html
                         <a href="{% url 'customers:profile' %}" class="mobile-nav-link">
                             <i class="fas fa-user-edit mr-3"></i>Profile Saya
                         </a>
-                    </nav>
-                </div>
+                        <a href="{% url 'customers:notifications' %}" class="mobile-nav-link">
+                            <i class="fas fa-bell mr-3"></i>Notifikasi
+                        </a>
+
+                        <div class="border-t border-gray-200 my-4"></div>
+
+                        <a href="{% url 'home' %}" class="mobile-nav-link">
+                            <i class="fas fa-globe mr-3"></i>Website Utama
+                        </a>
+                        <a href="{% url 'content:faq' %}" class="mobile-nav-link">
+                            <i class="fas fa-question-circle mr-3"></i>FAQ & Bantuan
+                        </a>
+
+                        <div class="border-t border-gray-200 my-4"></div>
+
+                        <a href="{% url 'customers:logout' %}" class="mobile-nav-link text-red-600">
+                            <i class="fas fa-sign-out-alt mr-3"></i>Logout
+                        </a>
+                    </div>
+                </nav>
             </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="toast bg-white shadow-lg rounded-lg border-l-4 {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500{% elif message.tags == 'warning' %}border-yellow-500{% else %}border-blue-500{% endif %} p-4 max-w-sm transform transition-all duration-300 ease-in-out"
-                     data-toast-id="{{ forloop.counter }}">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            {% if message.tags == 'success' %}
-                                <i class="fas fa-check-circle text-green-500 text-lg"></i>
-                            {% elif message.tags == 'error' %}
-                                <i class="fas fa-exclamation-circle text-red-500 text-lg"></i>
-                            {% elif message.tags == 'warning' %}
-                                <i class="fas fa-exclamation-triangle text-yellow-500 text-lg"></i>
-                            {% else %}
-                                <i class="fas fa-info-circle text-blue-500 text-lg"></i>
-                            {% endif %}
-                        </div>
-                        <div class="ml-3 flex-1">
-                            <p class="text-sm font-medium text-gray-900">
-                                {% if message.tags == 'success' %}Berhasil!
-                                {% elif message.tags == 'error' %}Error!
-                                {% elif message.tags == 'warning' %}Peringatan!
-                                {% else %}Info!
-                                {% endif %}
-                            </p>
-                            <p class="text-sm text-gray-600">{{ message }}</p>
-                        </div>
-                        <div class="ml-4 flex-shrink-0">
-                            <button type="button"
-                                    class="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none"
-                                    onclick="dismissToast({{ forloop.counter }})">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        {% endif %}
+    <!-- Main Content -->
+    <div class="lg:pl-72">
+        <!-- Mobile Top Spacing -->
+        <div class="lg:hidden h-16"></div>
+
+        <!-- Page Content -->
+        <main class="main-content p-4 lg:p-8">
+            {% block customer_content %}
+            {% endblock %}
+        </main>
     </div>
-    <script>
-        function dismissToast(toastId) {
-            const toast = document.querySelector(`[data-toast-id="${toastId}"]`);
-            if (toast) {
-                toast.style.transform = 'translateX(100%)';
-                toast.style.opacity = '0';
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
-            }
+</div>
+
+<style>
+.mobile-nav-link {
+    @apply flex items-center px-4 py-3 text-gray-700 rounded-lg transition-colors duration-200 hover:bg-blue-50 hover:text-blue-700;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mobile menu functionality
+    const mobileToggle = document.getElementById('mobile-sidebar-toggle');
+    const mobileOverlay = document.getElementById('mobile-sidebar-overlay');
+    const mobileClose = document.getElementById('mobile-sidebar-close');
+    const mobileBackdrop = document.getElementById('mobile-sidebar-backdrop');
+    const mobileSidebar = document.querySelector('.mobile-sidebar');
+
+    function showMobileSidebar() {
+        mobileOverlay.classList.remove('hidden');
+        setTimeout(() => {
+            mobileSidebar.classList.add('open');
+        }, 10);
+    }
+
+    function hideMobileSidebar() {
+        mobileSidebar.classList.remove('open');
+        setTimeout(() => {
+            mobileOverlay.classList.add('hidden');
+        }, 300);
+    }
+
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', showMobileSidebar);
+    }
+
+    if (mobileClose) {
+        mobileClose.addEventListener('click', hideMobileSidebar);
+    }
+
+    if (mobileBackdrop) {
+        mobileBackdrop.addEventListener('click', hideMobileSidebar);
+    }
+
+    // Auto-hide mobile menu on link click
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', hideMobileSidebar);
+    });
+
+    // Close mobile menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !mobileOverlay.classList.contains('hidden')) {
+            hideMobileSidebar();
         }
-
-        // Auto dismiss toasts after 5 seconds
-        document.addEventListener('DOMContentLoaded', function () {
-            const toasts = document.querySelectorAll('.toast');
-            toasts.forEach((toast, index) => {
-                setTimeout(() => {
-                    const toastId = toast.getAttribute('data-toast-id');
-                    dismissToast(toastId);
-                }, 5000 + (index * 1000)); // Stagger dismissal
-            });
-        });
-    </script>
-
-    <style>
-        .nav-link {
-            @apply flex items-center px-4 py-3 text-gray-700 rounded-lg transition-colors duration-200 hover:bg-blue-50 hover:text-blue-700;
-        }
-
-        .nav-link.active {
-            @apply bg-blue-50 text-blue-700 border-r-4 border-blue-700;
-        }
-
-        .mobile-nav-link {
-            @apply block px-4 py-3 text-gray-700 rounded-lg transition-colors duration-200 hover:bg-blue-50;
-        }
-    </style>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const mobileToggle = document.getElementById('mobile-sidebar-toggle');
-            const mobileOverlay = document.getElementById('mobile-sidebar-overlay');
-            const mobileClose = document.getElementById('mobile-sidebar-close');
-            const mobileBackdrop = document.getElementById('mobile-sidebar-backdrop');
-
-            function showMobileSidebar() {
-                mobileOverlay.classList.remove('hidden');
-            }
-
-            function hideMobileSidebar() {
-                mobileOverlay.classList.add('hidden');
-            }
-
-            if (mobileToggle) {
-                mobileToggle.addEventListener('click', showMobileSidebar);
-            }
-
-            if (mobileClose) {
-                mobileClose.addEventListener('click', hideMobileSidebar);
-            }
-
-            if (mobileBackdrop) {
-                mobileBackdrop.addEventListener('click', hideMobileSidebar);
-            }
-        });
-    </script>
+    });
+});
+</script>
 {% endblock %}
