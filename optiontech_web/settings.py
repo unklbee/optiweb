@@ -116,6 +116,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Custom Authentication Backends
+AUTHENTICATION_BACKENDS = [
+    'core.backends.EmailOrUsernameModelBackend',  # Custom backend untuk email/username login
+    'django.contrib.auth.backends.ModelBackend',  # Default backend (fallback)
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

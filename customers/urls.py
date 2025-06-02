@@ -1,10 +1,11 @@
 # ========================================
-# customers/urls.py
+# customers/urls.py - UPDATED
 # ========================================
 
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from .forms import CustomPasswordResetForm, CustomSetPasswordForm
 
 app_name = 'customers'
 
@@ -18,21 +19,38 @@ urlpatterns = [
     ), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
 
-    # Password Reset
+    # Password Reset with Custom Forms
     path('password-reset/', auth_views.PasswordResetView.as_view(
         template_name='customers/password_reset.html',
         email_template_name='customers/password_reset_email.html',
+        html_email_template_name='customers/password_reset_email.html',
         subject_template_name='customers/password_reset_subject.txt',
-        extra_context={'page_title': 'Reset Password'}
+        form_class=CustomPasswordResetForm,
+        extra_context={
+            'page_title': 'Reset Password - Service Laptop Bandung'
+        }
     ), name='password_reset'),
+
     path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(
-        template_name='customers/password_reset_done.html'
+        template_name='customers/password_reset_done.html',
+        extra_context={
+            'page_title': 'Reset Password Terkirim - Service Laptop Bandung'
+        }
     ), name='password_reset_done'),
+
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
-        template_name='customers/password_reset_confirm.html'
+        template_name='customers/password_reset_confirm.html',
+        form_class=CustomSetPasswordForm,
+        extra_context={
+            'page_title': 'Konfirmasi Reset Password - Service Laptop Bandung'
+        }
     ), name='password_reset_confirm'),
+
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
-        template_name='customers/password_reset_complete.html'
+        template_name='customers/password_reset_complete.html',
+        extra_context={
+            'page_title': 'Password Berhasil Direset - Service Laptop Bandung'
+        }
     ), name='password_reset_complete'),
 
     # Customer Dashboard

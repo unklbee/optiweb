@@ -1,5 +1,5 @@
 <!-- ========================================
-templates/customers/register.html
+templates/customers/register.html - UPDATED
 ======================================== -->
 
 {% extends 'base.html' %}
@@ -27,7 +27,7 @@ templates/customers/register.html
             <form method="post" class="space-y-6">
                 {% csrf_token %}
 
-                <!-- Display form errors -->
+                <!-- Display non-field errors -->
                 {% if form.non_field_errors %}
                 <div class="bg-red-50 border border-red-200 rounded-md p-4">
                     <div class="flex">
@@ -44,12 +44,19 @@ templates/customers/register.html
                 <!-- Username -->
                 <div>
                     <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                        {{ form.username.label }}
+                        {{ form.username.label }} <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
                         {{ form.username }}
                         {% if form.username.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ form.username.errors.0 }}</p>
+                        <div class="mt-2">
+                            {% for error in form.username.errors %}
+                            <p class="text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ error }}
+                            </p>
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -57,12 +64,21 @@ templates/customers/register.html
                 <!-- Email -->
                 <div>
                     <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                        {{ form.email.label }}
+                        {{ form.email.label }} <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
                         {{ form.email }}
                         {% if form.email.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                        <div class="mt-2">
+                            {% for error in form.email.errors %}
+                            <p class="text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ error }}
+                            </p>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="mt-1 text-xs text-gray-500">Email akan digunakan untuk login dan notifikasi</p>
                         {% endif %}
                     </div>
                 </div>
@@ -71,23 +87,37 @@ templates/customers/register.html
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                            {{ form.first_name.label }}
+                            {{ form.first_name.label }} <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-1">
                             {{ form.first_name }}
                             {% if form.first_name.errors %}
-                            <p class="mt-2 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                            <div class="mt-2">
+                                {% for error in form.first_name.errors %}
+                                <p class="text-sm text-red-600 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>
+                                    {{ error }}
+                                </p>
+                                {% endfor %}
+                            </div>
                             {% endif %}
                         </div>
                     </div>
                     <div>
                         <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                            {{ form.last_name.label }}
+                            {{ form.last_name.label }} <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-1">
                             {{ form.last_name }}
                             {% if form.last_name.errors %}
-                            <p class="mt-2 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
+                            <div class="mt-2">
+                                {% for error in form.last_name.errors %}
+                                <p class="text-sm text-red-600 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>
+                                    {{ error }}
+                                </p>
+                                {% endfor %}
+                            </div>
                             {% endif %}
                         </div>
                     </div>
@@ -96,12 +126,21 @@ templates/customers/register.html
                 <!-- Phone -->
                 <div>
                     <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                        {{ form.phone.label }}
+                        {{ form.phone.label }} <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
                         {{ form.phone }}
                         {% if form.phone.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ form.phone.errors.0 }}</p>
+                        <div class="mt-2">
+                            {% for error in form.phone.errors %}
+                            <p class="text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ error }}
+                            </p>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="mt-1 text-xs text-gray-500">Format: 08xxxxxxxxxx (min 10 digit)</p>
                         {% endif %}
                     </div>
                 </div>
@@ -114,7 +153,16 @@ templates/customers/register.html
                     <div class="mt-1">
                         {{ form.whatsapp }}
                         {% if form.whatsapp.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ form.whatsapp.errors.0 }}</p>
+                        <div class="mt-2">
+                            {% for error in form.whatsapp.errors %}
+                            <p class="text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ error }}
+                            </p>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="mt-1 text-xs text-gray-500">Kosongkan jika sama dengan nomor telepon</p>
                         {% endif %}
                     </div>
                 </div>
@@ -127,7 +175,16 @@ templates/customers/register.html
                     <div class="mt-1">
                         {{ form.address }}
                         {% if form.address.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ form.address.errors.0 }}</p>
+                        <div class="mt-2">
+                            {% for error in form.address.errors %}
+                            <p class="text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ error }}
+                            </p>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="mt-1 text-xs text-gray-500">Untuk layanan pickup & delivery (opsional)</p>
                         {% endif %}
                     </div>
                 </div>
@@ -135,12 +192,21 @@ templates/customers/register.html
                 <!-- Password -->
                 <div>
                     <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                        {{ form.password1.label }}
+                        {{ form.password1.label }} <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
                         {{ form.password1 }}
                         {% if form.password1.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ form.password1.errors.0 }}</p>
+                        <div class="mt-2">
+                            {% for error in form.password1.errors %}
+                            <p class="text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ error }}
+                            </p>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="mt-1 text-xs text-gray-500">Minimum 8 karakter, tidak boleh terlalu umum</p>
                         {% endif %}
                     </div>
                 </div>
@@ -148,12 +214,19 @@ templates/customers/register.html
                 <!-- Confirm Password -->
                 <div>
                     <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                        {{ form.password2.label }}
+                        {{ form.password2.label }} <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
                         {{ form.password2 }}
                         {% if form.password2.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ form.password2.errors.0 }}</p>
+                        <div class="mt-2">
+                            {% for error in form.password2.errors %}
+                            <p class="text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ error }}
+                            </p>
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -162,12 +235,40 @@ templates/customers/register.html
                 <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
                     <h3 class="text-sm font-medium text-blue-800 mb-2">Keuntungan Menjadi Member:</h3>
                     <ul class="text-sm text-blue-700 space-y-1">
-                        <li>✓ Tracking real-time status service</li>
-                        <li>✓ Dapatkan points setiap service</li>
-                        <li>✓ Tukar points dengan discount/reward</li>
-                        <li>✓ History lengkap semua service</li>
-                        <li>✓ Notifikasi progress via email/WhatsApp</li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-blue-600 mr-2"></i>
+                            Tracking real-time status service
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-blue-600 mr-2"></i>
+                            Dapatkan points setiap service
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-blue-600 mr-2"></i>
+                            Tukar points dengan discount/reward
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-blue-600 mr-2"></i>
+                            History lengkap semua service
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-blue-600 mr-2"></i>
+                            Notifikasi progress via email/WhatsApp
+                        </li>
                     </ul>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="flex items-start">
+                    <input id="agree_terms" name="agree_terms" type="checkbox" required
+                           class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="agree_terms" class="ml-2 block text-sm text-gray-700">
+                        Saya menyetujui 
+                        <a href="#" class="text-blue-600 hover:text-blue-500">Syarat dan Ketentuan</a> 
+                        serta 
+                        <a href="#" class="text-blue-600 hover:text-blue-500">Kebijakan Privasi</a>
+                        <span class="text-red-500">*</span>
+                    </label>
                 </div>
 
                 <!-- Submit Button -->
@@ -201,4 +302,132 @@ templates/customers/register.html
         </div>
     </div>
 </div>
+
+<!-- JavaScript for enhanced UX -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Real-time email validation
+    const emailField = document.getElementById('{{ form.email.id_for_label }}');
+    const emailError = emailField.parentNode.querySelector('.text-red-600');
+    
+    if (emailField) {
+        emailField.addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email) {
+                // Simple email format validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    this.classList.add('border-red-500');
+                } else {
+                    this.classList.remove('border-red-500');
+                    this.classList.add('border-green-500');
+                }
+            }
+        });
+    }
+    
+    // Real-time password strength indicator
+    const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+    if (password1) {
+        password1.addEventListener('input', function() {
+            const password = this.value;
+            const strengthIndicator = this.parentNode.querySelector('.password-strength') || 
+                document.createElement('div');
+            
+            if (!this.parentNode.querySelector('.password-strength')) {
+                strengthIndicator.className = 'password-strength mt-1 text-xs';
+                this.parentNode.appendChild(strengthIndicator);
+            }
+            
+            let strength = 0;
+            let feedback = [];
+            
+            if (password.length >= 8) strength += 1;
+            else feedback.push('minimal 8 karakter');
+            
+            if (/[A-Z]/.test(password)) strength += 1;
+            else feedback.push('huruf besar');
+            
+            if (/[a-z]/.test(password)) strength += 1;
+            else feedback.push('huruf kecil');
+            
+            if (/\d/.test(password)) strength += 1;
+            else feedback.push('angka');
+            
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+            else feedback.push('karakter khusus');
+            
+            let color, message;
+            if (strength < 2) {
+                color = 'text-red-600';
+                message = 'Lemah';
+            } else if (strength < 4) {
+                color = 'text-yellow-600';
+                message = 'Sedang';
+            } else {
+                color = 'text-green-600';
+                message = 'Kuat';
+            }
+            
+            strengthIndicator.className = `password-strength mt-1 text-xs ${color}`;
+            strengthIndicator.textContent = password ? `Kekuatan password: ${message}` : '';
+        });
+    }
+    
+    // Phone number formatting
+    const phoneField = document.getElementById('{{ form.phone.id_for_label }}');
+    if (phoneField) {
+        phoneField.addEventListener('input', function() {
+            // Remove non-digits
+            let value = this.value.replace(/\D/g, '');
+            
+            // Format Indonesian phone number
+            if (value.startsWith('62')) {
+                value = '0' + value.substring(2);
+            }
+            
+            // Limit to 15 digits
+            if (value.length > 15) {
+                value = value.substring(0, 15);
+            }
+            
+            this.value = value;
+            
+            // Visual feedback
+            if (value.length >= 10 && value.length <= 15) {
+                this.classList.remove('border-red-500');
+                this.classList.add('border-green-500');
+            } else if (value.length > 0) {
+                this.classList.add('border-red-500');
+                this.classList.remove('border-green-500');
+            } else {
+                this.classList.remove('border-red-500', 'border-green-500');
+            }
+        });
+    }
+    
+    // Auto-fill WhatsApp with phone number
+    const whatsappField = document.getElementById('{{ form.whatsapp.id_for_label }}');
+    if (phoneField && whatsappField) {
+        phoneField.addEventListener('blur', function() {
+            if (this.value && !whatsappField.value) {
+                whatsappField.value = this.value;
+            }
+        });
+    }
+    
+    // Form submission validation
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const agreeTerms = document.getElementById('agree_terms');
+            if (!agreeTerms.checked) {
+                e.preventDefault();
+                alert('Anda harus menyetujui Syarat dan Ketentuan untuk melanjutkan pendaftaran.');
+                agreeTerms.focus();
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
